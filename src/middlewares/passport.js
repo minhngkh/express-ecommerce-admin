@@ -13,7 +13,7 @@ passport.use(
     async (username, password, cb) => {
       let user;
       try {
-        user = await adminsService.getAdminInfo(username, [
+        user = await adminsService.getAdminInfoFromUsername(username, [
           "username",
           "password",
         ]);

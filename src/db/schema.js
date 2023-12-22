@@ -10,9 +10,9 @@ const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   email: text("email").unique().notNull(),
   password: text("password").notNull(),
-  full_name: text("full_name"),
+  fullName: text("full_name"),
   avatar: text("avatar"),
-  created_at: text("created_at").default(sql`current_timestamp`),
+  createdAt: text("created_at").default(sql`current_timestamp`),
 });
 
 const products = sqliteTable("products", {
@@ -24,7 +24,7 @@ const products = sqliteTable("products", {
   image: text("image").notNull(),
 });
 
-const laptop_products = sqliteTable("laptop_products", {
+const laptopProducts = sqliteTable("laptop_products", {
   id: integer("id")
     .primaryKey()
     .references(() => products.id),
@@ -35,18 +35,18 @@ const laptop_products = sqliteTable("laptop_products", {
   storage: text("storage"),
 });
 
-const product_reviews = sqliteTable(
+const productReviews = sqliteTable(
   "product_reviews",
   {
-    product_id: integer("product_id").references(() => products.id),
-    user_id: integer("user_id").references(() => users.id),
+    productId: integer("product_id").references(() => products.id),
+    userId: integer("user_id").references(() => users.id),
     rating: integer("rating").notNull(),
     comment: text("comment"),
-    created_at: text("created_at").default(sql`current_timestamp`),
+    createdAt: text("created_at").default(sql`current_timestamp`),
   },
   (table) => {
     return {
-      pk: primaryKey({ columns: [table.product_id, table.user_id] }),
+      pk: primaryKey({ columns: [table.productId, table.userId] }),
     };
   },
 );
@@ -55,14 +55,14 @@ const admins = sqliteTable("admins", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   username: text("username").unique().notNull(),
   password: text("password").notNull(),
-  full_name: text("full_name"),
-  created_at: text("created_at").default(sql`current_timestamp`),
+  fullName: text("full_name"),
+  createdAt: text("created_at").default(sql`current_timestamp`),
 });
 
 module.exports = {
   users,
   products,
-  laptop_products,
-  product_reviews,
+  laptopProducts,
+  productReviews,
   admins,
 };

@@ -3,26 +3,26 @@ const { eq, sql } = require("drizzle-orm");
 
 const db = require("#db/client");
 const { admins } = require("#db/schema");
-const { pick } = require("#utils/objectHelpers");
+const { inclusivePick } = require("#utils/objectHelpers");
 
 const SALT_ROUNDS = 10;
 
-const AdminFieldsSelection = {
+const AdminFields = {
   id: admins.id,
   username: admins.username,
   password: admins.password,
-  fullName: admins.full_name,
-  createdAt: admins.created_at,
+  fullName: admins.fullName,
+  createdAt: admins.createdAt,
 };
 
-/** Get all admin info
+/** Get all admin info from username
  *
  * @param {string} username
  * @returns
  */
-exports.getAllAdminInfo = (username) => {
+exports.getAllAdminInfoFromUsername = (username) => {
   const query = db
-    .select(AdminFieldsSelection)
+    .select(AdminFields)
     .from(admins)
     .where(eq(admins.username, username))
     .limit(1);
@@ -32,15 +32,15 @@ exports.getAllAdminInfo = (username) => {
   });
 };
 
-/** Get parts of admin info
+/** Get parts of admin info from username
  *
  * @param {string} username
- * @param {Array.<keyof typeof AdminFieldsSelection>} fields
+ * @param {Array.<keyof typeof AdminFields>} fields
  * @returns
  */
-exports.getAdminInfo = (username, fields) => {
+exports.getAdminInfoFromUsername = (username, fields) => {
   const query = db
-    .select(pick(AdminFieldsSelection, fields))
+    .select(inclusivePick(AdminFields, fields))
     .from(admins)
     .where(eq(admins.username, username))
     .limit(1);
@@ -69,19 +69,19 @@ exports.existsAdmin = (username) => {
 
 /** Create admin
  *
- * @param {Object} admin
- * @param {string} admin.fullName
- * @param {string} admin.username
- * @param {string} admin.password
+ * @param {Object} adminData
+ * @param {string} adminData.fullName
+ * @param {string} adminData.username
+ * @param {string} adminData.password
  * @returns
  */
-exports.createAdmin = (admin) => {
-  return bcrypt.hash(admin.password, SALT_ROUNDS).then((hash) => {
+exports.createAdmin = (adminData) => {
+  return bcrypt.hash(adminData.password, SALT_ROUNDS).then((hash) => {
     const query = db
       .insert(admins)
       .values({
-        full_name: admin.fullName,
-        username: admin.username,
+        fullName: adminData.fullName,
+        username: adminData.username,
         password: hash,
       })
       .returning({ insertedId: admins.id });
