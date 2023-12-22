@@ -1,0 +1,141 @@
+<main class="flex min-h-full items-center bg-gray-100 py-16 dark:bg-slate-900">
+  <div class="mx-auto w-full max-w-md p-6">
+    <div
+      class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
+    >
+      <div class="p-4 sm:p-7">
+        <div class="text-center">
+          <h1
+            class="block text-2xl font-bold text-gray-800 dark:text-white"
+          >Sign in</h1>
+        </div>
+
+        <div class="mt-5">
+          <!-- Form -->
+          <form
+            x-data="{ usernameValidity: true, passwordValidity: true}"
+            action="/auth/signin"
+            method="POST"
+          >
+            <div class="grid gap-y-4">
+              <!-- Form Group -->
+              <div>
+                <label
+                  for="username"
+                  class="mb-2 block text-sm dark:text-white"
+                >Username</label>
+                <div class="relative">
+                  <input
+                    :class="usernameValidity ? 'border-gray-200 focus:border-teal-500 focus:ring-teal-500' : 'border-red-500 focus:border-red-500 focus:ring-red-500'"
+                    type="text"
+                    id="username"
+                    name="username"
+                    class="block w-full rounded-lg px-4 py-3 text-sm disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
+                    required
+                    aria-describedby="username-error"
+                    autocomplete="username"
+                  />
+                  <div
+                    :class="usernameValidity ? 'hidden' : ''"
+                    class="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-3"
+                  >
+                    <svg
+                      class="h-5 w-5 text-red-500"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      viewBox="0 0 16 16"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                {{! <p
+                  :class="emailValidity ? 'hidden' : ''"
+                  class="mt-2 text-xs text-red-600"
+                  id="email-error"
+                >Please include a valid email address</p> }}
+              </div>
+              <!-- End Form Group -->
+
+              <!-- Form Group -->
+              <div>
+                <div class="flex items-center justify-between">
+                  <label
+                    for="password"
+                    class="mb-2 block text-sm dark:text-white"
+                  >Password</label>
+                  <a
+                    class="text-sm font-medium text-teal-600 decoration-2 hover:underline dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+                    href="#"
+                  >Forgot password?</a>
+                </div>
+                <div class="relative">
+                  <input
+                    :class="passwordValidity ? 'border-gray-200 focus:border-teal-500 focus:ring-teal-500' : 'border-red-500 focus:border-red-500 focus:ring-red-500'"
+                    type="password"
+                    id="password"
+                    name="password"
+                    class="block w-full rounded-lg px-4 py-3 text-sm disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
+                    required
+                    aria-describedby="password-error"
+                    autocomplete="current-password"
+                  />
+                  <div
+                    :class="passwordValidity ? 'hidden' : ''"
+                    class="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-3"
+                  >
+                    <svg
+                      class="h-5 w-5 text-red-500"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      viewBox="0 0 16 16"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <!-- End Form Group -->
+
+              {{! TODO: Remember me
+              <!-- Checkbox -->
+              <div class="flex items-center">
+                <div class="flex">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    class="pointer-events-none mt-0.5 shrink-0 rounded border-gray-200 text-teal-600 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:checked:border-teal-500 dark:checked:bg-teal-500 dark:focus:ring-offset-gray-800"
+                  />
+                </div>
+                <div class="ms-3">
+                  <label
+                    for="remember-me"
+                    class="text-sm dark:text-white"
+                  >Remember me</label>
+                </div>
+              </div>
+              <!-- End Checkbox -->
+              }}
+
+              <button
+                @click="usernameValidity = username.checkValidity(); passwordValidity = password.checkValidity();"
+                type="submit"
+                class="mt-2 inline-flex w-full items-center justify-center gap-x-2 rounded-lg border border-transparent bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:pointer-events-none disabled:opacity-50 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+              >Sign in</button>
+            </div>
+          </form>
+          <!-- End Form -->
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
