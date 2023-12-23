@@ -21,3 +21,8 @@ const UserFields = {
 exports.updateUser = (id, userData) => {
   db.update(users).set(userData).where(eq(users.id, id));
 };
+
+exports.genUserAvatarName = (req, res, next) => {
+  res.locals.imgNames = [`user-${req.params.userId}`];
+  next();
+};
