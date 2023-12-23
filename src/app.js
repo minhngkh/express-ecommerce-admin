@@ -1,6 +1,6 @@
 const express = require("express");
-const hbsLayouts = require("handlebars-layouts");
 const hbs = require("hbs");
+const hbsLayouts = require("handlebars-layouts");
 const createError = require("http-errors");
 const logger = require("morgan");
 const path = require("path");

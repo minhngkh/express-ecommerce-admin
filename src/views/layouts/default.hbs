@@ -1,9 +1,24 @@
-{{#extend "layout"}}
+{{#extend "skeleton"}}
   {{#content "body"}}
     {{#extend "sidebar"}}{{/extend}}
 
     <div class="p-4 sm:ml-64">
       {{{body}}}
     </div>
+  {{/content}}
+
+  {{! prettier-ignore}}
+  {{#content "script"}}
+    <script>
+      document.addEventListener('alpine:init', () => {
+          Alpine.store('sidebar', {
+              on: false,
+  
+              toggle() {
+                  this.on = ! this.on
+              }
+          })
+      })
+    </script>
   {{/content}}
 {{/extend}}
