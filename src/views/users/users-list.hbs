@@ -1,0 +1,343 @@
+<div class="flex flex-col">
+  <div class="-m-1.5 overflow-x-auto">
+    <div class="inline-block min-w-full p-1.5 align-middle">
+      <div
+        class="divide-y divide-gray-200 rounded-lg border dark:divide-gray-700 dark:border-gray-700"
+      >
+        <!-- Search & sort -->
+        <form
+          id="search-form"
+          x-data="{ name: '{{query.name}}', email: '{{query.email}}', sort: '{{query.sort}}'}"
+          action="/users"
+          method="get"
+          class="m-0 flex items-center gap-x-4 p-3"
+        >
+          <div class="relative">
+            <select
+              x-model="sort"
+              name="sort"
+              class="block w-full rounded-lg border-gray-200 px-3 py-2 pe-9 text-sm focus:border-teal-500 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
+            >
+              <option value="name-asc">Name (asc)</option>
+              <option value="name-desc">Name (desc)</option>
+              <option value="email-asc">Email (asc)</option>
+              <option value="email-desc">Email (desc)</option>
+              <option value="regTime-asc">Registration time (asc)</option>
+              <option value="regTime-desc">Registration time (desc)</option>
+            </select>
+          </div>
+
+          <div>
+            <div class="relative max-w-xs">
+              <label class="sr-only">Search</label>
+              <input
+                @pageshow.window="name = $el.value"
+                x-model="name"
+                :name="name ? 'name' : ''"
+                type="search"
+                class="block w-full rounded-lg border-gray-200 px-3 py-2 ps-9 text-sm shadow-sm focus:z-10 focus:border-teal-500 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
+                placeholder="Name"
+              />
+              <div
+                class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3"
+              >
+                <svg
+                  class="h-4 w-4 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="">
+            <div class="relative max-w-xs">
+              <label class="sr-only">Search</label>
+              <input
+                x-model="email"
+                :name="email ? 'email' : ''"
+                type="search"
+                class="block w-full rounded-lg border-gray-200 px-3 py-2 ps-9 text-sm shadow-sm focus:z-10 focus:border-teal-500 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
+                placeholder="Email"
+              />
+              <div
+                class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3"
+              >
+                <svg
+                  class="h-4 w-4 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="px-2 text-sm font-medium text-teal-500 underline-offset-2 hover:underline"
+          >
+            Apply
+          </button>
+
+        </form>
+        <!-- Search & sort -->
+
+        <!-- Table -->
+        <div class="overflow-hidden">
+          <table
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+          >
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th
+                  scope="col"
+                  class="py-3 pl-6 text-center text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
+                ></th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
+                >Full name</th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
+                >Email</th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
+                >Registration time</th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-center text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
+                >Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <template x-for="user in $store.users.list" :key="user.id">
+                <tr>
+                  <td
+                    class="w-0 whitespace-nowrap pl-6 text-sm text-gray-800 dark:text-gray-200"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      xmlns:xlink="http://www.w3.org/1999/xlink"
+                      version="1.1"
+                      width="30"
+                      height="30"
+                      viewBox="0 0 600 600"
+                      fill="white"
+                    >
+                      <defs>
+                        <clipPath id="circular-border">
+                          <circle cx="300" cy="300" r="280" />
+                        </clipPath>
+                        <clipPath id="avoid-antialiasing-bugs">
+                          <rect width="100%" height="498" />
+                        </clipPath>
+                      </defs>
+                      <circle
+                        cx="300"
+                        cy="300"
+                        r="280"
+                        fill="gray"
+                        clip-path="url(#avoid-antialiasing-bugs)"
+                      />
+                      <circle cx="300" cy="230" r="115" />
+                      <circle
+                        cx="300"
+                        cy="550"
+                        r="205"
+                        clip-path="url(#circular-border)"
+                      />
+                    </svg>
+                  </td>
+                  <td
+                    x-text="user.fullName"
+                    class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-800 dark:text-gray-200"
+                  ></td>
+                  <td
+                    x-text="user.email"
+                    class="whitespace-nowrap px-6 py-4 text-sm text-gray-800 dark:text-gray-200"
+                  ></td>
+                  <td
+                    x-text="toLocalDate(user.createdAt)"
+                    class="whitespace-nowrap px-6 py-4 text-sm text-gray-800 dark:text-gray-200"
+                  ></td>
+                  <td
+                    class="whitespace-nowrap px-6 py-4 text-center text-sm font-medium"
+                  >
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-x-2 rounded-lg border border-transparent text-sm font-semibold text-teal-600 hover:text-teal-800 disabled:pointer-events-none disabled:opacity-50 dark:text-teal-500 dark:hover:text-teal-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+                    >Delete</button>
+                  </td>
+                </tr>
+              </template>
+
+              <template x-if="$store.users.isEmpty()">
+                <tr>
+                  <td
+                    colspan="5"
+                    class="whitespace-nowrap px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-gray-200"
+                  >No users found</td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <!-- Table -->
+
+        <!-- Pagination -->
+        <div
+          x-show="!$store.users.isEmpty()"
+          class="grid place-items-center p-3"
+        >
+          <nav class="inline-flex items-center justify-center gap-3">
+            <button
+              @click="$store.users.update(await $store.page.go($store.page.prev));"
+              :disabled="!$store.page.prev"
+              class="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
+            >
+              <span class="sr-only">Previous Page</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-3 w-3"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+
+            <p class="text-xs text-gray-900 dark:text-white">
+              <span x-text="$store.page.current"></span>
+              <span class="mx-0.25">/</span>
+              <span x-text="$store.page.total"></span>
+            </p>
+
+            <button
+              @click="$store.users.update(await $store.page.go($store.page.next));"
+              :disabled="!$store.page.next"
+              class="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
+            >
+              <span class="sr-only">Next Page</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-3 w-3"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </nav>
+        </div>
+        <!-- Pagination -->
+      </div>
+    </div>
+  </div>
+</div>
+
+{{! prettier-ignore }}
+{{#content "script"}}
+  <script>
+    document.addEventListener("alpine:init", () => {
+      Alpine.store("users", {
+        init() {
+          window.addEventListener("popstate", (event) => {
+            this.list = event.state.usersList;
+          });
+        },
+
+        list: {{{toString usersList}}},
+
+        isEmpty() {
+          return this.list.length === 0;
+        },
+
+        update(usersList) {
+          this.list = usersList;
+        }
+      });
+
+      Alpine.store("page", {
+        init() {
+          this.total = {{page.total}};
+          this.current = {{page.current}};
+
+          window.addEventListener("popstate", (event) => {
+            this.total = event.state.total;
+            this.current = event.state.current;
+          });
+        },
+
+        total: null,
+        current: null,
+
+        get prev() {
+          return this.current > 1 ? this.current - 1 : null;
+        },
+
+        get next() {
+          return this.current < this.total ? this.current + 1 : null;
+        },
+
+        async go(page) {
+          const searchParams = new URL(document.location).searchParams;
+          searchParams.set("page", page);
+          const queryString = searchParams.toString();
+
+          try {
+            const result = await fetch(`/api/users?${queryString}`);
+
+            if (result.ok) {
+              const data = await result.json();
+
+              history.pushState(data, "", `/users?${queryString}`);
+
+              this.total = data.total;
+              this.current = data.current;
+
+              return data.usersList;
+            }
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      });
+    });
+
+
+    const toLocalDate = (time) => {
+      if (!time) {
+        return "";
+      }
+
+      const date = new Date(time);
+      return date.toISOString().replace("T"," ").substring(0, 19);
+    }
+  </script>
+{{/content}}
