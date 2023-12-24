@@ -41,21 +41,34 @@
   <body x-cloak x-data>
     {{#extend "sidebar"}}{{/extend}}
 
-    <div class="p-6 sm:ml-64">
+    <div class="sm:ml-64">
       {{{body}}}
     </div>
+
+    {{#extend "notification"}}{{/extend}}
 
     {{! prettier-ignore}}
     <script>
       document.addEventListener('alpine:init', () => {
           Alpine.store('sidebar', {
               on: false,
+              selected: null,
+              page: null,
   
               toggle() {
                   this.on = ! this.on
               }
           })
       })
+
+      const toLocalDate = (time) => {
+        if (!time) {
+          return "";
+        }
+
+        const date = new Date(time);
+        return date.toISOString().replace("T"," ").substring(0, 19);
+      }
     </script>
 
     {{#block "script"}}{{/block}}

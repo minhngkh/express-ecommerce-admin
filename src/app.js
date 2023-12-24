@@ -10,11 +10,11 @@ const passport = require("#middlewares/passport");
 const session = require("#middlewares/session");
 const hbsHelpers = require("#utils/hbsHelpers");
 
-const usersApiRouter = require("#components/users/api/router");
+const accountsApiRouter = require("#components/accounts/api/router");
 
+const accountsRouter = require("#components/accounts/router");
 const authRouter = require("#components/auth/router");
 const homeRouter = require("#components/home/router");
-const usersRouter = require("#components/users/router");
 
 // Init Express app
 const app = express();
@@ -52,10 +52,10 @@ app.use("/auth", authRouter);
 
 app.use(authenticated.require);
 
-app.use("/api/users", usersApiRouter);
+app.use("/api/accounts", accountsApiRouter);
 
 app.use("/", homeRouter);
-app.use("/users", usersRouter);
+app.use("/accounts", accountsRouter);
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {

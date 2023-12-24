@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { createAdmin } = require("#components/admins/service");
+const { createAdmin } = require("#components/accounts/admins/service");
 
 const admin = {
   fullName: "Test Account",

@@ -1,6 +1,6 @@
 const usersService = require("./service");
 
-exports.renderUserList = async (req, res, next) => {
+exports.renderUsersList = async (req, res, next) => {
   try {
     const newQuery = usersService.addDefaultValues(req.query);
 
@@ -11,8 +11,8 @@ exports.renderUserList = async (req, res, next) => {
 
     const totalPages = Math.ceil(totalUsers / newQuery.limit);
 
-    res.render("users/users-list", {
-      title: "Admin | Users list",
+    res.render("accounts/users-list", {
+      title: "Accounts | Users list",
       usersList: usersList,
       query: newQuery,
       page: {
@@ -23,4 +23,19 @@ exports.renderUserList = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+exports.renderUserDetails = async (req, res, next) => {
+  const userDetails = await usersService.getUserDetails(req.params.id);
+
+  if (!userDetails) {
+    return next();
+  }
+
+  console.log(userDetails);
+
+  res.render("accounts/user-details", {
+    title: "Accounts | User details",
+    user: userDetails,
+  });
 };

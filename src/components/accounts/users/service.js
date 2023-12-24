@@ -3,18 +3,9 @@ const { asc, and, count, desc, eq, like, sql } = require("drizzle-orm");
 const db = require("#db/client");
 const { users } = require("#db/schema");
 
-const DEFAULT_LIST_LIMIT = 6;
+const DEFAULT_LIST_LIMIT = 12;
 
 const UtcTimeField = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${users.createdAt})`;
-
-const UserFields = {
-  id: users.id,
-  email: users.email,
-  password: users.password,
-  fullName: users.fullName,
-  avatar: users.avatar,
-  createAt: UtcTimeField,
-};
 
 /**
  *
@@ -34,6 +25,24 @@ exports.genUserAvatarName = (req, res, next) => {
   next();
 };
 
+exports.getUserDetails = (id) => {
+  const query = db
+    .select({
+      id: users.id,
+      email: users.email,
+      fullName: users.fullName,
+      avatar: users.avatar,
+      createdAt: UtcTimeField,
+    })
+    .from(users)
+    .where(eq(users.id, id))
+    .limit(1);
+
+  return query.then((val) => {
+    return val.length ? val[0] : null;
+  });
+};
+
 exports.getTotalUsers = (query) => {
   const conditions = createConditionsList(query);
   const dbQuery = db
@@ -51,6 +60,30 @@ exports.getUserList = (query) => {
 
   const conditions = createConditionsList(query);
 
+  let order;
+  switch (query.sort) {
+    case "name-asc":
+      order = asc(users.fullName);
+      break;
+    case "name-desc":
+      order = desc(users.fullName);
+      break;
+    case "email-asc":
+      order = asc(users.email);
+      break;
+    case "email-desc":
+      order = desc(users.email);
+      break;
+    case "regTime-asc":
+      order = asc(users.createdAt);
+      break;
+    case "regTime-desc":
+      order = desc(users.createdAt);
+      break;
+    default:
+      return [];
+  }
+
   return db
     .select({
       id: users.id,
@@ -61,7 +94,7 @@ exports.getUserList = (query) => {
     })
     .from(users)
     .where(and(...conditions))
-    .orderBy(query.sort)
+    .orderBy(order)
     .limit(query.limit)
     .offset((query.page - 1) * query.limit);
 };
@@ -91,31 +124,8 @@ exports.addDefaultValues = (query) => {
     newQuery.page = 1;
   }
 
-  if (Object.hasOwn(newQuery, "sort")) {
-    switch (newQuery.sort) {
-      case "name-asc":
-        newQuery.sort = asc(users.fullName);
-        break;
-      case "name-desc":
-        newQuery.sort = desc(users.fullName);
-        break;
-      case "email-asc":
-        newQuery.sort = asc(users.email);
-        break;
-      case "email-desc":
-        newQuery.sort = desc(users.email);
-        break;
-      case "regTime-asc":
-        newQuery.sort = asc(users.createdAt);
-        break;
-      case "regTime-desc":
-        newQuery.sort = desc(users.createdAt);
-        break;
-      default:
-        break;
-    }
-  } else {
-    newQuery.sort = desc(users.createdAt);
+  if (!Object.hasOwn(newQuery, "sort")) {
+    newQuery.sort = "regTime-desc";
   }
 
   return newQuery;

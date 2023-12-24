@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 
-const adminsService = require("#components/admins/service");
+const adminsService = require("#components/accounts/admins/service");
 
 passport.use(
   new LocalStrategy(

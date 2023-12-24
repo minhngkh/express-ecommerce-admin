@@ -87,11 +87,13 @@
     <ul class="space-y-2 font-medium">
       <li>
         <a
+          :class="$store.sidebar.selected === 'Dashboard' ? 'bg-gray-200 dark:bg-gray-700' : ''"
           href="/"
-          class="group flex items-center rounded-lg p-2 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+          class="group flex items-center rounded-lg p-2 text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700"
         >
           <svg
-            class="h-5 w-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+            :class="$store.sidebar.selected === 'Dashboard' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
+            class="h-5 w-5 transition duration-75"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
@@ -110,11 +112,13 @@
 
       <li>
         <a
-          href="/"
-          class="group flex items-center rounded-lg p-2 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+          :class="$store.sidebar.selected === 'Products' ? 'bg-gray-200 dark:bg-gray-700' : ''"
+          href="#"
+          class="group flex items-center rounded-lg p-2 text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700"
         >
           <svg
-            class="h-5 w-5 flex-shrink-0 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+            :class="$store.sidebar.selected === 'Products' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
+            class="h-5 w-5 transition duration-75"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
@@ -127,6 +131,64 @@
           <span class="ms-3">Products</span>
         </a>
       </li>
+
+      <li
+        x-data="{ open: false }"
+        x-init="$watch('$store.sidebar.selected', val => open = val === 'Accounts')"
+      >
+        <button
+          @click="open = !open"
+          :class="$store.sidebar.selected === 'Accounts' ? 'bg-gray-200 dark:bg-gray-700' : ''"
+          type="button"
+          class="group flex w-full items-center rounded-lg p-2 text-base text-gray-900 transition duration-75 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700"
+          aria-controls="dropdown"
+        >
+          <svg
+            :class="$store.sidebar.selected === 'Accounts' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
+            class="h-5 w-5 transition duration-75"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 576 512"
+          ><path
+              d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H512c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm80 256h64c44.2 0 80 35.8 80 80c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16c0-44.2 35.8-80 80-80zm-32-96a64 64 0 1 1 128 0 64 64 0 1 1 -128 0zm256-32H496c8.8 0 16 7.2 16 16s-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H496c8.8 0 16 7.2 16 16s-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H496c8.8 0 16 7.2 16 16s-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s7.2-16 16-16z"
+            /></svg>
+          <span
+            class="ms-3 flex-1 whitespace-nowrap text-left rtl:text-right"
+          >Accounts</span>
+          <svg
+            class="h-3 w-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 10 6"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 4 4 4-4"
+            />
+          </svg>
+        </button>
+        <ul x-show="open" class="space-y-2 py-2">
+          <li>
+            <a
+              :class="$store.sidebar.page === 'Users' ? 'text-teal-700' : 'text-gray-900'"
+              href="/accounts/users"
+              class="group flex w-full items-center rounded-lg p-2 pl-11 transition duration-75 hover:text-teal-700 dark:text-white dark:hover:bg-gray-700"
+            >Users</a>
+          </li>
+          <li>
+            <a
+              :class="$store.sidebar.page === 'Admins' ? 'text-teal-700' : 'text-gray-900'"
+              href="/accounts/admins"
+              class="group flex w-full items-center rounded-lg p-2 pl-11 transition duration-75 hover:text-teal-700 dark:text-white dark:hover:bg-gray-700"
+            >Admins</a>
+          </li>
+        </ul>
+      </li>
     </ul>
 
     <ul
@@ -134,11 +196,13 @@
     >
       <li>
         <a
-          href="#"
-          class="group flex items-center rounded-lg p-2 text-gray-900 transition duration-75 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+          :class="$store.sidebar.selected === 'Profile' ? 'bg-gray-200 dark:hover:bg-gray-700' : ''"
+          href="/"
+          class="group flex items-center rounded-lg p-2 text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700"
         >
           <svg
-            class="h-5 w-5 flex-shrink-0 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+            :class="$store.sidebar.selected === 'Profile' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
+            class="h-5 w-5 transition duration-75"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
@@ -148,17 +212,17 @@
               d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
             />
           </svg>
-          <span class="ms-3">Account</span>
+          <span class="ms-3">Profile</span>
         </a>
       </li>
 
       <li>
         <a
           href="/auth/signout"
-          class="group flex items-center rounded-lg p-2 text-gray-900 transition duration-75 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+          class="group flex items-center rounded-lg p-2 text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700"
         >
           <svg
-            class="h-5 w-5 flex-shrink-0 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+            class="h-5 w-5 text-gray-500 transition duration-75 dark:text-gray-400"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
