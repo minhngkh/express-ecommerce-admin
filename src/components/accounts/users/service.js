@@ -1,11 +1,11 @@
 const { asc, and, count, desc, eq, like, sql } = require("drizzle-orm");
 
 const db = require("#db/client");
-const { users } = require("#db/schema");
+const { user } = require("#db/schema");
 
 const DEFAULT_LIST_LIMIT = 12;
 
-const UtcTimeField = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${users.createdAt})`;
+const UtcTimeField = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${user.createdAt})`;
 
 /**
  *
@@ -17,7 +17,7 @@ const UtcTimeField = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${users.createdAt})`;
  * @returns
  */
 exports.updateUser = (id, userData) => {
-  db.update(users).set(userData).where(eq(users.id, id));
+  db.update(user).set(userData).where(eq(user.id, id));
 };
 
 exports.genUserAvatarName = (req, res, next) => {
@@ -28,14 +28,14 @@ exports.genUserAvatarName = (req, res, next) => {
 exports.getUserDetails = (id) => {
   const query = db
     .select({
-      id: users.id,
-      email: users.email,
-      fullName: users.fullName,
-      avatar: users.avatar,
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      avatar: user.avatar,
       createdAt: UtcTimeField,
     })
-    .from(users)
-    .where(eq(users.id, id))
+    .from(user)
+    .where(eq(user.id, id))
     .limit(1);
 
   return query.then((val) => {
@@ -49,7 +49,7 @@ exports.getTotalUsers = (query) => {
     .select({
       count: count(),
     })
-    .from(users)
+    .from(user)
     .where(and(...conditions));
 
   return dbQuery.then((val) => val[0].count);
@@ -63,22 +63,22 @@ exports.getUserList = (query) => {
   let order;
   switch (query.sort) {
     case "name-asc":
-      order = asc(users.fullName);
+      order = asc(user.fullName);
       break;
     case "name-desc":
-      order = desc(users.fullName);
+      order = desc(user.fullName);
       break;
     case "email-asc":
-      order = asc(users.email);
+      order = asc(user.email);
       break;
     case "email-desc":
-      order = desc(users.email);
+      order = desc(user.email);
       break;
     case "regTime-asc":
-      order = asc(users.createdAt);
+      order = asc(user.createdAt);
       break;
     case "regTime-desc":
-      order = desc(users.createdAt);
+      order = desc(user.createdAt);
       break;
     default:
       return [];
@@ -86,13 +86,13 @@ exports.getUserList = (query) => {
 
   return db
     .select({
-      id: users.id,
-      email: users.email,
-      fullName: users.fullName,
-      avatar: users.avatar,
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      avatar: user.avatar,
       createdAt: UtcTimeField,
     })
-    .from(users)
+    .from(user)
     .where(and(...conditions))
     .orderBy(order)
     .limit(query.limit)
@@ -139,11 +139,11 @@ const createConditionsList = (query) => {
   const conditions = [];
 
   if (Object.hasOwn(query, "name")) {
-    conditions.push(like(users.fullName, `%${query.name}%`));
+    conditions.push(like(user.fullName, `%${query.name}%`));
   }
 
   if (Object.hasOwn(query, "email")) {
-    conditions.push(like(users.email, `%${query.email}%`));
+    conditions.push(like(user.email, `%${query.email}%`));
   }
 
   return conditions;

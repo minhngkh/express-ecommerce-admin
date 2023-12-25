@@ -32,8 +32,6 @@ exports.renderAminDetails = async (req, res, next) => {
     return next();
   }
 
-  console.log(adminDetails);
-
   res.render("accounts/admin-details", {
     title: "Accounts | Admin details",
     admin: adminDetails,

@@ -32,8 +32,6 @@ exports.renderUserDetails = async (req, res, next) => {
     return next();
   }
 
-  console.log(userDetails);
-
   res.render("accounts/user-details", {
     title: "Accounts | User details",
     user: userDetails,
