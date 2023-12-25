@@ -5,6 +5,8 @@ const cloudinary = require("#middlewares/cloudinary");
 
 const router = express.Router();
 
+router.get("/", (req, res) => res.send("Products API"));
+
 router.get(
   "/:productId/images/uploadSignature",
   apiProductsController.genProductImgNames,

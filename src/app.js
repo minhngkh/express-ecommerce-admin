@@ -57,6 +57,9 @@ app.use("/api/accounts", accountsApiRouter);
 app.use("/", homeRouter);
 app.use("/accounts", accountsRouter);
 
+var testRouter = require("#components/products/api/router");
+app.use("/test", testRouter);
+
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
   next(createError(404));
