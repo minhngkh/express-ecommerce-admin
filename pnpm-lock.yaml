@@ -82,9 +82,6 @@ devDependencies:
   eslint:
     specifier: ^8.55.0
     version: 8.56.0
-  handlebars-layout:
-    specifier: ^0.1.4
-    version: 0.1.4
   nodemon:
     specifier: ^3.0.2
     version: 3.0.2
@@ -2392,10 +2389,6 @@ packages:
 
   /graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
-    dev: true
-
-  /handlebars-layout@0.1.4:
-    resolution: {integrity: sha512-n/+9/RTJ48xCBLjiKHJoXhk/I7Hx8J18ciEkFomWNsIPzTrYNzhE8DkhNimtmLCCjsihem2L1o28Qly8TOgwnQ==}
     dev: true
 
   /handlebars-layouts@3.1.4:

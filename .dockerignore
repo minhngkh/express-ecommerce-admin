@@ -4,3 +4,10 @@ public/styles/style.css
 
 client_wal_index
 local.db*
+
+.vscode/
+.github/
+
+drizzle/
+script*.sql
+scripts/
