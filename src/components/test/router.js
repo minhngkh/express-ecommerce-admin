@@ -23,18 +23,18 @@ router.get("/categories", async (req, res) => {
 });
 
 // Add a new category
-router.get("/ ", async (req, res) => {
+router.get("/category", async (req, res) => {
   const categoryData = {
-    name: "test",
-    description: "A powerful move forward.",
+    name: "Gaming",
+    description: "Playing an electronic video game.",
   };
-  const category = await productsService.addCategory(categoryData);
+  const category = await productsService.addSubcategory(1, categoryData);
   res.send("Category added");
 });
 
 // View a category
 router.get("/category/:categoryId", async (req, res) => {
-  const category = await productsService.getCategory(req.params.categoryId);
+  const category = await productsService.getSubcategory(req.params.categoryId);
 
   res.json(category);
 });
@@ -45,7 +45,7 @@ router.get("/update-category/:categoryId", async (req, res) => {
     name: "Phones",
     description: "Experience the power of the future.",
   };
-  const category = await productsService.updateCategory(
+  const category = await productsService.updateSubcategory(
     req.params.categoryId,
     categoryData,
   );
@@ -55,7 +55,7 @@ router.get("/update-category/:categoryId", async (req, res) => {
 
 // Delete a category
 router.get("/delete-category/:categoryId", async (req, res) => {
-  const category = await productsService.removeCategory(req.params.categoryId);
+  const category = await productsService.removeSubcategory(req.params.categoryId);
   res.send("Category deleted");
 });
 

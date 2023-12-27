@@ -21,7 +21,5 @@ exports.processSearchQuery = (searchQuery) => {
     page: Object.hasOwn(searchQuery, "page") ? Number(searchQuery.page) : null,
 
     sort: Object.hasOwn(searchQuery, "sort") ? searchQuery.sort : null,
-
-    filter: Object.hasOwn(searchQuery, "filter") ? searchQuery.filter : null,
   };
 };

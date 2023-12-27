@@ -151,10 +151,9 @@ exports.getSubcategories = (categoryId) => {
  * @param {Object} categoryData
  * @param {string} categoryData.name
  * @param {string} [categoryData.description]
- * @returns
  */
-exports.addSubcategory = (categoryId, categoryData) => {
-  db.insert(productSubcategory).values({
+exports.addSubcategory = async (categoryId, categoryData) => {
+  await db.insert(productSubcategory).values({
     categoryId: categoryId,
     name: categoryData.name,
     description: categoryData.description ? categoryData.description : null,
@@ -162,10 +161,35 @@ exports.addSubcategory = (categoryId, categoryData) => {
 };
 
 /**
+ * Read a subcategory
+ * @param {Number} subcategoryId
+ * @returns
+ */
+exports.getSubcategory = (subcategoryId) => {
+  return db
+    .select()
+    .from(productSubcategory)
+    .where(eq(productSubcategory.id, subcategoryId));
+};
+
+/**
+ * Update a subcategory
+ * @param {Number} subcategoryId
+ * @param {Object} subcategoryData
+ * @param {string} subcategoryData.name
+ * @param {string} [subcategoryData.description]
+ */
+exports.updateSubcategory = async (subcategoryId, subcategoryData) => {
+  await db.update(productSubcategory).set({
+    name: subcategoryData.name,
+    description: subcategoryData.description ? subcategoryData.description : null,
+  }).where(eq(productSubcategory.id, subcategoryId));
+}
+
+/**
  * Remove a subcategory
  * @param {Number} subcategoryId
  * @param {boolean} toRemoveProducts
- * @returns {void}
  */
 exports.removeSubcategory = async (subcategoryId, toRemoveProducts) => {
   if (toRemoveProducts) {
