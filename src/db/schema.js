@@ -71,7 +71,9 @@ const product = sqliteTable(
     categoryId: integer("category_id").references(() => productCategory.id),
     name: text("name").notNull(),
     price: integer("price").notNull(),
-    brandId: integer("brand_id").references(() => productBrand.id),
+    brandId: integer("brand_id").references(() => productBrand.id, {
+      onDelete: "set null",
+    }),
     subcategoryId: integer("subcategory_id"),
     status: text("status").notNull(),
     createdAt: text("created_at").default(sql`current_timestamp`),
@@ -108,7 +110,7 @@ const laptopProduct = sqliteTable(
       productReference: foreignKey({
         columns: [table.productId, table.categoryId],
         foreignColumns: [product.id, product.categoryId],
-      }),
+      }).onDelete("cascade"),
     };
   },
 );
@@ -132,7 +134,7 @@ const phoneProduct = sqliteTable(
       productReference: foreignKey({
         columns: [table.productId, table.categoryId],
         foreignColumns: [product.id, product.categoryId],
-      }),
+      }).onDelete("cascade"),
     };
   },
 );
