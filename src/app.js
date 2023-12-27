@@ -15,6 +15,7 @@ const accountsApiRouter = require("#components/accounts/api/router");
 const accountsRouter = require("#components/accounts/router");
 const authRouter = require("#components/auth/router");
 const homeRouter = require("#components/home/router");
+const testRouter = require("#components/test/router");
 
 // Init Express app
 const app = express();
@@ -56,6 +57,8 @@ app.use("/api/accounts", accountsApiRouter);
 
 app.use("/", homeRouter);
 app.use("/accounts", accountsRouter);
+
+app.use("/test", testRouter);
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
