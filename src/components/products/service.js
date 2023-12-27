@@ -122,14 +122,25 @@ exports.addSubcategory = (categoryId, categoryData) => {
  * @param {boolean} toRemoveProducts
  * @returns {void}
  */
-exports.removeSubcategory = async (subcategoryId, toRemoveProducts) => {
+exports.removeSubcategory = (subcategoryId, toRemoveProducts) => {
   if (toRemoveProducts) {
-    await db.delete(product).where(eq(product.subcategoryId, subcategoryId));
+    db.batch([
+      db.delete(product).where(eq(product.subcategoryId, subcategoryId)),
+      db
+        .delete(productSubcategory)
+        .where(eq(productSubcategory.id, subcategoryId)),
+    ]);
+  } else {
+    db.batch([
+      db
+        .update(product)
+        .set({ subcategoryId: null })
+        .where(eq(product.subcategoryId, subcategoryId)),
+      db
+        .delete(productSubcategory)
+        .where(eq(productSubcategory.id, subcategoryId)),
+    ]);
   }
-
-  await db
-    .delete(productSubcategory)
-    .where(eq(productSubcategory.id, subcategoryId));
 };
 
 /**
@@ -146,12 +157,15 @@ exports.getBrands = () => {
  * @param {boolean} toRemoveProducts
  * @returns {void}
  */
-exports.removeBrand = async (brandId, toRemoveProducts) => {
+exports.removeBrand = (brandId, toRemoveProducts) => {
   if (toRemoveProducts) {
-    await db.delete(product).where(eq(product.brandId, brandId));
+    db.batch([
+      db.delete(product).where(eq(product.brandId, brandId)),
+      db.delete(productBrand).where(eq(productBrand.id, brandId)),
+    ]);
+  } else {
+    db.delete(productBrand).where(eq(productBrand.id, brandId));
   }
-
-  await db.delete(productBrand).where(eq(productBrand.id, brandId));
 };
 
 // Helper functions
