@@ -8,62 +8,8 @@ const {
   uniqueIndex,
 } = require("drizzle-orm/sqlite-core");
 
-// const users = sqliteTable("users", {
-//   id: integer("id").primaryKey({ autoIncrement: true }),
-//   email: text("email").unique().notNull(),
-//   password: text("password").notNull(),
-//   fullName: text("full_name"),
-//   avatar: text("avatar"),
-//   createdAt: text("created_at").default(sql`current_timestamp`),
-// });
-
-// const products = sqliteTable("products", {
-//   id: integer("id").primaryKey({ autoIncrement: true }),
-//   name: text("name").notNull(),
-//   price: integer("price").notNull(),
-//   category: text("category").notNull(),
-//   brand: text("brand").notNull(),
-//   image: text("image").notNull(),
-// });
-
-// const laptopProducts = sqliteTable("laptop_products", {
-//   id: integer("id")
-//     .primaryKey()
-//     .references(() => products.id),
-//   subcategory: text("subcategory"),
-//   cpu: text("cpu"),
-//   resolution: text("resolution"),
-//   ram: text("ram"),
-//   storage: text("storage"),
-// });
-
-// const productReviews = sqliteTable(
-//   "product_reviews",
-//   {
-//     productId: integer("product_id").references(() => products.id),
-//     userId: integer("user_id").references(() => users.id),
-//     rating: integer("rating").notNull(),
-//     comment: text("comment"),
-//     createdAt: text("created_at").default(sql`current_timestamp`),
-//   },
-//   (table) => {
-//     return {
-//       pk: primaryKey({ columns: [table.productId, table.userId] }),
-//     };
-//   },
-// );
-
-// const admins = sqliteTable("admins", {
-//   id: integer("id").primaryKey({ autoIncrement: true }),
-//   username: text("username").unique().notNull(),
-//   password: text("password").notNull(),
-//   fullName: text("full_name"),
-//   createdAt: text("created_at").default(sql`current_timestamp`),
-// });
-
-// new ones
-// TODO: remember to manually add the check constraint for each product
-// tables & Add indexes to the foreign keys
+// TODO: Add check constraint for each product tables & Add indexes for the
+// foreign keys
 
 const user = sqliteTable("user", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -95,12 +41,22 @@ const productCategory = sqliteTable("product_category", {
   description: text("description"),
 });
 
-const productSubcategory = sqliteTable("product_subcategory", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  categoryId: integer("category_id").references(() => productCategory.id),
-  name: text("name").notNull(),
-  description: text("description"),
-});
+const productSubcategory = sqliteTable(
+  "product_subcategory",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    categoryId: integer("category_id").references(() => productCategory.id),
+    name: text("name").notNull(),
+    description: text("description"),
+  },
+  (table) => {
+    return {
+      idCategoryIdUnique: uniqueIndex(
+        "ux__product_subcategory__id__category_id",
+      ).on(table.id, table.categoryId),
+    };
+  },
+);
 
 const productBrand = sqliteTable("product_brand", {
   id: integer("id").primaryKey(),
@@ -116,15 +72,17 @@ const product = sqliteTable(
     name: text("name").notNull(),
     price: integer("price").notNull(),
     brandId: integer("brand_id").references(() => productBrand.id),
-    subcategoryId: integer("subcategory_id").references(
-      () => productSubcategory.id,
-    ),
+    subcategoryId: integer("subcategory_id"),
     status: text("status").notNull(),
     createdAt: text("created_at").default(sql`current_timestamp`),
   },
   (table) => {
     return {
-      idCategoryIdIdx: uniqueIndex("id_category_id_unique").on(
+      subcategoryRef: foreignKey({
+        columns: [table.subcategoryId, table.categoryId],
+        foreignColumns: [productSubcategory.id, productSubcategory.categoryId],
+      }),
+      idCategoryIdUnique: uniqueIndex("ux__product__id__category_id").on(
         table.id,
         table.categoryId,
       ),
@@ -189,10 +147,9 @@ const productImage = sqliteTable(
   },
   (table) => {
     return {
-      productIdIsPrimaryIdx: uniqueIndex("product_id_is_primary_unique").on(
-        table.productId,
-        table.isPrimary,
-      ),
+      productIdIsPrimaryUnique: uniqueIndex(
+        "ux__product_image__product_id__is_primary",
+      ).on(table.productId, table.isPrimary),
     };
   },
 );
@@ -209,10 +166,9 @@ const productReview = sqliteTable(
   },
   (table) => {
     return {
-      productIdUserIdIdx: uniqueIndex("product_id_user_id_unique").on(
-        table.productId,
-        table.userId,
-      ),
+      productIdUserIdUnique: uniqueIndex(
+        "ux__product_review__product_id__user_id",
+      ).on(table.productId, table.userId),
     };
   },
 );
