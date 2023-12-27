@@ -1,381 +1,223 @@
-const { asc, and, count, desc, eq, like, sql, gt, lt } = require("drizzle-orm");
+const { asc, and, desc, eq, like, sql } = require("drizzle-orm");
 
 const db = require("#db/client");
-const { user } = require("#db/schema");
-const { product, laptopProduct, phoneProduct,  } = require("#db/schema");
-
-const DEFAULT_LIST_LIMIT = 24;
-
-const UtcTimeField = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${user.createdAt})`;
-
-/**
- *
- * @param {Number} id
- * @returns
- */
-exports.banAccount = (id) => {
-    db.update(user).set({ banned: true }).where(eq(user.id, id));
-};
+const {
+  product,
+  productBrand,
+  productCategory,
+  productImage,
+  productSubcategory,
+} = require("#db/schema");
 
 /**
- * @param {Number} id
+ * @enum {string}
+ */
+const ListOrder = {
+  CreationTimeAsc: "creationTime-asc",
+  CreationTimeDesc: "creationTime-desc",
+  PriceAsc: "price-asc",
+  PriceDesc: "price-desc",
+  TotalAsc: "total-asc",
+  TotalDesc: "total-desc",
+};
+
+/**
+ * @typedef {Object} Query
+ * @property {number} categoryId
+ * @property {number} subcategoryId
+ * @property {number} brandId
+ * @property {string} name
+ * @property {number} limit
+ * @property {number} page
+ * @property {ListOrder} sort
+ */
+
+const DefaultListLimit = 24;
+
+const ProductUtcCreatedAt = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${product.createdAt})`;
+
+// TODO: Total purchases sort
+/**
+ * Get list of products matching query
+ * @param {Query} query
  * @returns
  */
-exports.unbanAccount = (id) => {
-    db.update(user).set({ banned: false }).where(eq(user.id, id));
+exports.getProducts = (query) => {
+  const isValid = processQuery(query);
+  if (!isValid) return [];
+
+  const conditions = createConditionsList(query);
+
+  return db
+    .select({
+      id: product.id,
+      category: productCategory.name,
+      name: product.name,
+      price: product.price,
+      brand: productBrand.name,
+      subcategory: productSubcategory.name,
+      status: product.status,
+      createdAt: ProductUtcCreatedAt,
+      image: productImage.source,
+    })
+    .from(product)
+    .innerJoin(productCategory, eq(product.categoryId, productCategory.id))
+    .innerJoin(productBrand, eq(product.brandId, productBrand.id))
+    .leftJoin(
+      productSubcategory,
+      eq(product.subcategoryId, productSubcategory.id),
+    )
+    .leftJoin(
+      productImage,
+      and(
+        eq(product.id, productImage.productId),
+        eq(productImage.isPrimary, true),
+      ),
+    )
+    .where(and(...conditions))
+    .orderBy(query.sort)
+    .limit(query.limit)
+    .offset((query.page - 1) * query.limit);
 };
 
-exports.viewProductList = (query) => {
-    const conditions = createConditionsList(query);
-    const dbQuery = db
-        .select({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            category: product.categoryId,
-            brand: product.brandId,
-            image: product.image,
-            createdAt: UtcTimeField,
-        })
-        .from(product)
-        .where(and(...conditions))
-        .orderBy(desc(product.createdAt))
-        .limit(DEFAULT_LIST_LIMIT);
-
-    return dbQuery;
+/**
+ * Get list of product categories
+ * @returns
+ */
+exports.getCategories = () => {
+  return db.select().from(productCategory);
 };
 
-exports.viewLaptopProductList = (query) => {
-    const conditions = createConditionsList(query);
-    const dbQuery = db
-        .select({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            category: product.categoryId,
-            brand: product.brandId,
-            image: product.image,
-            createdAt: UtcTimeField,
-            subcategory: laptopProduct.subcategory,
-            cpu: laptopProduct.cpu,
-            resolution: laptopProduct.resolution,
-            ram: laptopProduct.ram,
-            storage: laptopProduct.storage,
-        })
-        .from(product)
-        .innerJoin(laptopProduct)
-        .on(eq(product.id, laptopProduct.id))
-        .where(and(...conditions))
-        .orderBy(desc(product.createdAt))
-        .limit(DEFAULT_LIST_LIMIT);
-
-    return dbQuery;
+/**
+ * Get list of subcategories of a category
+ * @param {Number} categoryId
+ * @returns
+ */
+exports.getSubcategories = (categoryId) => {
+  return db
+    .select()
+    .from(productSubcategory)
+    .where(eq(productSubcategory.categoryId, categoryId));
 };
 
-exports.viewPhoneProductList = (query) => {
-    const conditions = createConditionsList(query);
-    const dbQuery = db
-        .select({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            category: product.categoryId,
-            brand: product.brandId,
-            image: product.image,
-            createdAt: UtcTimeField,
-            subcategory: phoneProduct.subcategory,
-            screenSize: phoneProduct.screenSize,
-            resolution: phoneProduct.resolution,
-            ram: phoneProduct.ram,
-            storage: phoneProduct.storage,
-        })
-        .from(product)
-        .innerJoin(phoneProduct)
-        .on(eq(product.id, phoneProduct.id))
-        .where(and(...conditions))
-        .orderBy(desc(product.createdAt))
-        .limit(DEFAULT_LIST_LIMIT);
-
-    return dbQuery;
+/**
+ * Add a new subcategory to a category
+ * @param {Number} categoryId
+ * @param {Object} categoryData
+ * @param {string} categoryData.name
+ * @param {string} [categoryData.description]
+ * @returns
+ */
+exports.addSubcategory = (categoryId, categoryData) => {
+  db.insert(productSubcategory).values({
+    categoryId: categoryId,
+    name: categoryData.name,
+    description: categoryData.description ? categoryData.description : null,
+  });
 };
 
-exports.sortProductList = (query) => {
-    if (typeof query === "undefined") return [];
-    
-    switch (query.sort) {
-        case "price-asc":
-            order = asc(product.price);
-            break;
-        case "price-desc":
-            order = desc(product.price);
-            break;
-        case "name-asc":
-            order = asc(product.name);
-            break;
-        case "name-desc":
-            order = desc(product.name);
-            break;
-        case "regTime-asc":
-            order = asc(product.createdAt);
-            break;
-        case "regTime-desc":
-            order = desc(product.createdAt);
-            break;
-        default:
-            return [];
-    }
-    
-    return db
-        .select({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            category: product.categoryId,
-            brand: product.brandId,
-            image: product.image,
-            createdAt: UtcTimeField,
-        })
-        .from(product)
-        .orderBy(order)
-        .limit(DEFAULT_LIST_LIMIT);
+/**
+ * Remove a subcategory
+ * @param {Number} subcategoryId
+ * @param {boolean} toRemoveProducts
+ * @returns {void}
+ */
+exports.removeSubcategory = async (subcategoryId, toRemoveProducts) => {
+  if (toRemoveProducts) {
+    await db.delete(product).where(eq(product.subcategoryId, subcategoryId));
+  }
+
+  await db
+    .delete(productSubcategory)
+    .where(eq(productSubcategory.id, subcategoryId));
 };
 
-exports.sortLaptopProductList = (query) => {
-    if (typeof query === "undefined") return [];
-    
-    switch (query.sort) {
-        case "price-asc":
-            order = asc(product.price);
-            break;
-        case "price-desc":
-            order = desc(product.price);
-            break;
-        case "name-asc":
-            order = asc(product.name);
-            break;
-        case "name-desc":
-            order = desc(product.name);
-            break;
-        case "regTime-asc":
-            order = asc(product.createdAt);
-            break;
-        case "regTime-desc":
-            order = desc(product.createdAt);
-            break;
-        default:
-            return [];
-    }
-    
-    return db
-        .select({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            category: product.categoryId,
-            brand: product.brandId,
-            image: product.image,
-            createdAt: UtcTimeField,
-            subcategory: laptopProduct.subcategory,
-            cpu: laptopProduct.cpu,
-            resolution: laptopProduct.resolution,
-            ram: laptopProduct.ram,
-            storage: laptopProduct.storage,
-        })
-        .from(product)
-        .innerJoin(laptopProduct)
-        .on(eq(product.id, laptopProduct.id))
-        .orderBy(order)
-        .limit(DEFAULT_LIST_LIMIT);
-}
+/**
+ * Get list of product brands
+ * @returns
+ */
+exports.getBrands = () => {
+  return db.select().from(productBrand);
+};
 
-exports.sortPhoneProductList = (query) => {
-    if (typeof query === "undefined") return [];
-    
-    switch (query.sort) {
-        case "price-asc":
-            order = asc(product.price);
-            break;
-        case "price-desc":
-            order = desc(product.price);
-            break;
-        case "name-asc":
-            order = asc(product.name);
-            break;
-        case "name-desc":
-            order = desc(product.name);
-            break;
-        case "regTime-asc":
-            order = asc(product.createdAt);
-            break;
-        case "regTime-desc":
-            order = desc(product.createdAt);
-            break;
-        default:
-            return [];
-    }
-    
-    return db
-        .select({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            category: product.categoryId,
-            brand: product.brandId,
-            image: product.image,
-            createdAt: UtcTimeField,
-            subcategory: phoneProduct.subcategory,
-            screenSize: phoneProduct.screenSize,
-            resolution: phoneProduct.resolution,
-            ram: phoneProduct.ram,
-            storage: phoneProduct.storage,
-        })
-        .from(product)
-        .innerJoin(phoneProduct)
-        .on(eq(product.id, phoneProduct.id))
-        .orderBy(order)
-        .limit(DEFAULT_LIST_LIMIT);
-}
+/**
+ * Remove a brand
+ * @param {Number} brandId
+ * @param {boolean} toRemoveProducts
+ * @returns {void}
+ */
+exports.removeBrand = async (brandId, toRemoveProducts) => {
+  if (toRemoveProducts) {
+    await db.delete(product).where(eq(product.brandId, brandId));
+  }
 
-exports.filterProductList = (query) => {
-    if (typeof query === "undefined") return [];
-    
-    let conditions = [];
-    switch (query.filter) {
-        case "price":
-            conditions.push(lt(product.price, query.price_max))
-            conditions.push(gt(product.price, query.price_min))
-            break;
-        case "name":
-            conditions.push(like(product.name, `%${query.name}%`));
-            break;
-        case "category":
-            conditions.push(eq(product.categoryId, query.category));
-            break;
-        case "brand":
-            conditions.push(eq(product.brandId, query.brand));
-            break;
-    }
-
-    if (Object.hasOwn(query, "prce")) {
-        conditions.push(eq(product.price, query.prce));
-    }
-
-    return db 
-        .select({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            category: product.categoryId,
-            brand: product.brandId,
-            image: product.image,
-            createdAt: UtcTimeField,
-        })
-        .from(product)
-        .where(and(...conditions))
-        .orderBy(desc(product.createdAt))
-        .limit(DEFAULT_LIST_LIMIT);
-}
-
-exports.filterLaptopProductList = (query) => {
-    if (typeof query === "undefined") return [];
-    
-    let conditions = [];
-    switch (query.filter) {
-        case "price":
-            conditions.push(lt(product.price, query.price_max))
-            conditions.push(gt(product.price, query.price_min))
-            break;
-        case "name":
-            conditions.push(like(product.name, `%${query.name}%`));
-            break;
-        case "category":
-            conditions.push(eq(product.categoryId, query.category));
-            break;
-        case "brand":
-            conditions.push(eq(product.brandId, query.brand));
-            break;
-    }
-
-    return db 
-        .select({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            category: product.categoryId,
-            brand: product.brandId,
-            image: product.image,
-            createdAt: UtcTimeField,
-            subcategory: laptopProduct.subcategory,
-            cpu: laptopProduct.cpu,
-            resolution: laptopProduct.resolution,
-            ram: laptopProduct.ram,
-            storage: laptopProduct.storage,
-        })
-        .from(product)
-        .innerJoin(laptopProduct)
-        .on(eq(product.id, laptopProduct.id))
-        .where(and(...conditions))
-        .orderBy(desc(product.createdAt))
-        .limit(DEFAULT_LIST_LIMIT);
-}
-
-exports.filterPhoneProductList = (query) => {
-    if (typeof query === "undefined") return [];
-    
-    let conditions = [];
-    switch (query.filter) {
-        case "price":
-            conditions.push(lt(product.price, query.price_max))
-            conditions.push(gt(product.price, query.price_min))
-            break;
-        case "name":
-            conditions.push(like(product.name, `%${query.name}%`));
-            break;
-        case "category":
-            conditions.push(eq(product.categoryId, query.category));
-            break;
-        case "brand":
-            conditions.push(eq(product.brandId, query.brand));
-            break;
-    }
-
-    return db 
-        .select({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            category: product.categoryId,
-            brand: product.brandId,
-            image: product.image,
-            createdAt: UtcTimeField,
-            subcategory: phoneProduct.subcategory,
-            screenSize: phoneProduct.screenSize,
-            resolution: phoneProduct.resolution,
-            ram: phoneProduct.ram,
-            storage: phoneProduct.storage,
-        })
-        .from(product)
-        .innerJoin(phoneProduct)
-        .on(eq(product.id, phoneProduct.id))
-        .where(and(...conditions))
-        .orderBy(desc(product.createdAt))
-        .limit(DEFAULT_LIST_LIMIT);
-}
+  await db.delete(productBrand).where(eq(productBrand.id, brandId));
+};
 
 // Helper functions
+
+/**
+ * Validate and add default values to query
+ * @param {Query} query
+ * @returns {boolean} query validity
+ */
+const processQuery = (query) => {
+  if (query.limit !== null) {
+    if (!Number.isInteger(query.limit) || query.limit < 1) return false;
+  } else {
+    query.limit = DefaultListLimit;
+  }
+
+  if (query.page !== null) {
+    if (!Number.isInteger(query.page) || query.page < 1) return false;
+  } else {
+    query.page = 1;
+  }
+
+  if (query.sort === null) {
+    query.sort = ListOrder.CreationTimeDesc;
+  } else {
+    switch (query.sort) {
+      case ListOrder.CreationTimeAsc:
+        query.sort = asc(product.createdAt);
+        break;
+      case ListOrder.CreationTimeDesc:
+        query.sort = desc(product.createdAt);
+        break;
+      case ListOrder.PriceAsc:
+        query.sort = asc(product.price);
+        break;
+      case ListOrder.PriceDesc:
+        query.sort = desc(product.price);
+        break;
+      default:
+        return false;
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Create conditions list from query
+ * @param {Query} query
+ * @returns
+ */
 const createConditionsList = (query) => {
-    const conditions = [];
-    if (Object.hasOwn(query, "category")) {
-        conditions.push(eq(product.categoryId, query.category));
-    }
-    if (Object.hasOwn(query, "brand")) {
-        conditions.push(eq(product.brandId, query.brand));
-    }
-    if (Object.hasOwn(query, "search")) {
-        conditions.push(like(product.name, `%${query.search}%`));
-    }
-    if (Object.hasOwn(query, "image")) {
-        conditions.push(eq(product.imageId, query.image));
-    }
-    return conditions;
+  const conditions = [];
+
+  if (query.categoryId !== null) {
+    conditions.push(eq(product.categoryId, query.categoryId));
+  }
+  if (query.subcategoryId !== null) {
+    conditions.push(eq(product.subcategoryId, query.subcategoryId));
+  }
+  if (query.brandId !== null) {
+    conditions.push(eq(product.brandId, query.brandId));
+  }
+  if (query.name !== null) {
+    conditions.push(like(product.name, `%${query.name}%`));
+  }
+
+  return conditions;
 };

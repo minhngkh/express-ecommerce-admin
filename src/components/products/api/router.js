@@ -2,7 +2,6 @@ const express = require("express");
 
 const apiProductsController = require("./controller");
 const cloudinary = require("#middlewares/cloudinary");
-const service = require("../service");
 
 const router = express.Router();
 
