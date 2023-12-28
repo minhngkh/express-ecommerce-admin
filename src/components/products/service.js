@@ -335,3 +335,57 @@ const createConditionsList = (query) => {
 
   return conditions;
 };
+
+const { order } = require("#db/schema");
+
+/**
+ * Create a order
+ * @param {Object} orderData
+ * @param {Number} orderData.userId
+ * @param {Number} orderData.productId
+ * @param {Number} orderData.quantity
+ * @param {Number} orderData.total
+ */
+exports.createOrder = async (orderData) => {
+  await db.insert(order).values({
+    userId: orderData.userId,
+    addressId: orderData.addressId,
+    status: orderData.status,
+    total: orderData.total,
+  });
+};
+
+/**
+ * Update a order status
+ * @param {Number} orderId
+ * @param {string} status
+ */
+exports.updateOrderStatus = async (orderId, status) => {
+  await db.update(order).set({
+    status: status,
+  }).where(eq(order.id, orderId));
+}
+
+/**
+ * view order list
+ * @param {Number} userId
+ * @returns
+ */
+exports.getOrders = (userId) => {
+  return db
+    .select()
+    .from(order)
+    .where(eq(order.userId, userId));
+}
+
+/**
+ * Get order detail
+ * @param {Number} orderId
+ * @returns
+ */
+exports.getOrder = (orderId) => {
+  return db
+    .select()
+    .from(order)
+    .where(eq(order.id, orderId));
+};

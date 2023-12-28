@@ -96,4 +96,35 @@ router.get("/delete-brand/:brandId", async (req, res) => {
   res.send("Brand deleted");
 });
 
+// View orders list
+router.get("/watch-others", async (req, res) => {
+  const orders = await productsService.getOrder(1);
+  res.json(orders);
+});
+
+const adminService = require("#components/accounts/admins/service");
+// Change admin profile
+router.get("/change-admin-profile", async (req, res) => {
+  const adminData = {
+    name: "admin1",
+    username: "admin",
+    password: "1",
+  };
+  const admin = await adminService.updateAdmin(0, adminData);
+  res.send("Admin profile updated");
+});
+
+// Change user profile
+const userService = require("#components/accounts/users/service");
+router.get("/change-user-profile", async (req, res) => {
+  const userData = {
+    email: "thinh@edu.com",
+    fullName: "Con meo",
+    avatar: "http://res.cloudinary.com/mavericks/image/upload/v1703416730/profile-pic/High.png",
+    address: 0,
+  };
+  const user = await userService.updateUserProfile(1, userData);
+  res.send("User profile updated");
+});
+
 module.exports = router;

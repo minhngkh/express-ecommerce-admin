@@ -148,3 +148,22 @@ const createConditionsList = (query) => {
 
   return conditions;
 };
+
+// Test
+/**
+ * Update user profile
+ * @param {Number} id
+ * @param {Object} userData
+ * @param {string} [userData.email]
+ * @param {string} [userData.fullName]
+ * @param {string} [userData.avatar]
+ * @param {Number} [userData.address]
+ */
+exports.updateUserProfile = async (id, userData) => {
+  await db.update(user).set({
+    email: userData.email,
+    fullName: userData.fullName,
+    avatar: userData.avatar,
+    addressId: userData.address,
+  }).where(eq(user.id, id));
+};
