@@ -89,6 +89,51 @@ exports.getCategories = () => {
 };
 
 /**
+ * Create a product category
+ * @param {Object} categoryData
+ * @param {string} categoryData.name
+ * @param {string} [categoryData.description]
+ */
+exports.addCategory = async (categoryData) => {
+  await db.insert(productCategory).values({
+    name: categoryData.name,
+    description: categoryData.description ? categoryData.description : null,
+  })
+};
+
+/**
+ * Read a product category
+ * @param {Number} categoryId
+ * @returns
+ */
+exports.getCategory = (categoryId) => {
+  return db.select().from(productCategory).where(eq(productCategory.id, categoryId));
+};
+
+/**
+ * Update a product category
+ * @param {Number} categoryId
+ * @param {Object} categoryData
+ * @param {string} categoryData.name
+ * @param {string} [categoryData.description]
+  */
+exports.updateCategory = async (categoryId, categoryData) => {
+  await db.update(productCategory).set({
+    name: categoryData.name,
+    description: categoryData.description ? categoryData.description : null,
+  }).where(eq(productCategory.id, categoryId));
+}
+
+/**
+ * Delete a product category
+ * @param {Number} categoryId
+ */
+exports.removeCategory = async (categoryId) => {
+  await db.delete(productCategory).where(eq(productCategory.id, categoryId));
+}
+
+
+/**
  * Get list of subcategories of a category
  * @param {Number} categoryId
  * @returns
@@ -106,10 +151,9 @@ exports.getSubcategories = (categoryId) => {
  * @param {Object} categoryData
  * @param {string} categoryData.name
  * @param {string} [categoryData.description]
- * @returns
  */
-exports.addSubcategory = (categoryId, categoryData) => {
-  db.insert(productSubcategory).values({
+exports.addSubcategory = async (categoryId, categoryData) => {
+  await db.insert(productSubcategory).values({
     categoryId: categoryId,
     name: categoryData.name,
     description: categoryData.description ? categoryData.description : null,
@@ -117,10 +161,35 @@ exports.addSubcategory = (categoryId, categoryData) => {
 };
 
 /**
+ * Read a subcategory
+ * @param {Number} subcategoryId
+ * @returns
+ */
+exports.getSubcategory = (subcategoryId) => {
+  return db
+    .select()
+    .from(productSubcategory)
+    .where(eq(productSubcategory.id, subcategoryId));
+};
+
+/**
+ * Update a subcategory
+ * @param {Number} subcategoryId
+ * @param {Object} subcategoryData
+ * @param {string} subcategoryData.name
+ * @param {string} [subcategoryData.description]
+ */
+exports.updateSubcategory = async (subcategoryId, subcategoryData) => {
+  await db.update(productSubcategory).set({
+    name: subcategoryData.name,
+    description: subcategoryData.description ? subcategoryData.description : null,
+  }).where(eq(productSubcategory.id, subcategoryId));
+}
+
+/**
  * Remove a subcategory
  * @param {Number} subcategoryId
  * @param {boolean} toRemoveProducts
- * @returns {void}
  */
 exports.removeSubcategory = (subcategoryId, toRemoveProducts) => {
   if (toRemoveProducts) {
@@ -150,6 +219,51 @@ exports.removeSubcategory = (subcategoryId, toRemoveProducts) => {
 exports.getBrands = () => {
   return db.select().from(productBrand);
 };
+
+/**
+ * Create a product brand
+ * @param {Object} brandData
+ * @param {string} brandData.name
+ * @param {string} [brandData.description]
+ */
+exports.addBrand = async (brandData) => {
+  await db.insert(productBrand).values({
+    name: brandData.name,
+    description: brandData.description ? brandData.description : null,
+  });
+}
+
+/**
+ * Read a product brand
+ * @param {Number} brandId
+ * @returns
+ */
+exports.getBrand = (brandId) => {
+  return db.select().from(productBrand).where(eq(productBrand.id, brandId));
+}
+
+/**
+ * Update a product brand
+ * @param {Number} brandId
+ * @param {Object} brandData
+ * @param {string} brandData.name
+ * @param {string} [brandData.description]
+ * @returns
+ */
+exports.updateBrand = async (brandId, brandData) => {
+  await db.update(productBrand).set({
+    name: brandData.name,
+    description: brandData.description ? brandData.description : null,
+  }).where(eq(productBrand.id, brandId));
+}
+
+/**
+ * Delete a product brand
+ * @param {Number} brandId
+ */
+exports.removeBrand = async (brandId) => {
+  await db.delete(productBrand).where(eq(productBrand.id, brandId));
+}
 
 /**
  * Remove a brand
@@ -205,7 +319,7 @@ const processQuery = (query) => {
         query.sort = desc(product.price);
         break;
       default:
-        return false;
+        console.log(query.sort)
     }
   }
 
@@ -234,4 +348,58 @@ const createConditionsList = (query) => {
   }
 
   return conditions;
+};
+
+const { order } = require("#db/schema");
+
+/**
+ * Create a order
+ * @param {Object} orderData
+ * @param {Number} orderData.userId
+ * @param {Number} orderData.productId
+ * @param {Number} orderData.quantity
+ * @param {Number} orderData.total
+ */
+exports.createOrder = async (orderData) => {
+  await db.insert(order).values({
+    userId: orderData.userId,
+    addressId: orderData.addressId,
+    status: orderData.status,
+    total: orderData.total,
+  });
+};
+
+/**
+ * Update a order status
+ * @param {Number} orderId
+ * @param {string} status
+ */
+exports.updateOrderStatus = async (orderId, status) => {
+  await db.update(order).set({
+    status: status,
+  }).where(eq(order.id, orderId));
+}
+
+/**
+ * view order list
+ * @param {Number} userId
+ * @returns
+ */
+exports.getOrders = (userId) => {
+  return db
+    .select()
+    .from(order)
+    .where(eq(order.userId, userId));
+}
+
+/**
+ * Get order detail
+ * @param {Number} orderId
+ * @returns
+ */
+exports.getOrder = (orderId) => {
+  return db
+    .select()
+    .from(order)
+    .where(eq(order.id, orderId));
 };

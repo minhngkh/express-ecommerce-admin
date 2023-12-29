@@ -217,3 +217,29 @@ const createConditionsList = (query) => {
 
   return conditions;
 };
+
+/**
+ * Update admin profile
+ * @param {Number} id
+ * @param {Object} adminData
+ * @param {string} adminData.name
+ * @param {string} adminData.username
+ * @param {string} adminData.password
+ * @returns
+ */
+exports.updateAdmin = async (id, adminData) => {
+  return bcrypt.hash(adminData.password, SALT_ROUNDS).then((hash) => {
+    const query = db
+      .update(admin)
+      .set({
+        name: adminData.name,
+        username: adminData.username,
+        password: hash,
+      })
+      .where(eq(admin.id, id));
+
+    return query.then((val) => {
+      return val;
+    });
+  });
+};
