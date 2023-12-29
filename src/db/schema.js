@@ -1,4 +1,4 @@
-const { sql } = require("drizzle-orm");
+const { eq, sql } = require("drizzle-orm");
 const {
   integer,
   foreignKey,
@@ -7,9 +7,6 @@ const {
   text,
   uniqueIndex,
 } = require("drizzle-orm/sqlite-core");
-
-// TODO: Add check constraint for each product tables & Add indexes for the
-// foreign keys
 
 const user = sqliteTable("user", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -58,6 +55,8 @@ const productSubcategory = sqliteTable(
   },
 );
 
+// To remove a brand, it's needed to set the categoryIf field of all products of
+// that brand to null first
 const productBrand = sqliteTable("product_brand", {
   id: integer("id").primaryKey(),
   name: text("name").notNull(),
@@ -96,7 +95,7 @@ const laptopProduct = sqliteTable(
   "laptop_product",
   {
     productId: integer("product_id").primaryKey(),
-    categoryId: integer("category_id"),
+    categoryId: integer("category_id"), // Check = 0
     screenSize: text("screen_size"),
     resolution: text("resolution"),
     cpu: text("cpu"),
@@ -119,7 +118,7 @@ const phoneProduct = sqliteTable(
   "phone_product",
   {
     productId: integer("product_id").primaryKey(),
-    categoryId: integer("category_id"),
+    categoryId: integer("category_id"), // Check = 1
     screenSize: text("screen_size"),
     resolution: text("resolution"),
     frontCamera: text("front_camera"),
@@ -151,7 +150,9 @@ const productImage = sqliteTable(
     return {
       productIdIsPrimaryUnique: uniqueIndex(
         "ux__product_image__product_id__is_primary",
-      ).on(table.productId, table.isPrimary),
+      )
+        .on(table.productId, table.isPrimary)
+        .where(eq(table.isPrimary, true)),
     };
   },
 );

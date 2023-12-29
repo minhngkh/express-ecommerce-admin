@@ -11,17 +11,21 @@ passport.use(
       passwordField: "password",
     },
     async (username, password, cb) => {
-      let user;
+      const account = {
+        username: username,
+      };
       try {
-        user = await adminsService.getAdminInfoFromUsername(username, [
-          "username",
+        const result = await adminsService.getAdminInfoFromUsername(username, [
+          "id",
           "password",
         ]);
+
+        Object.assign(account, result);
       } catch (err) {
         return cb(null, false, { message: "Incorrect username." });
       }
 
-      bcrypt.compare(password, user.password, (err, result) => {
+      bcrypt.compare(password, account.password, (err, result) => {
         if (err) {
           return cb(err);
         }
@@ -32,7 +36,7 @@ passport.use(
           });
         }
 
-        return cb(null, user);
+        return cb(null, account);
       });
     },
   ),

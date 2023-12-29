@@ -4,7 +4,7 @@ const { drizzle } = require("drizzle-orm/libsql");
 const schema = require("./schema");
 
 let client;
-if (!process.env.DB === "local") {
+if (process.env.DB === "local") {
   client = createClient({
     url: process.env.DATABASE_LOCAL_PATH,
     syncUrl: process.env.DATABASE_URL,
