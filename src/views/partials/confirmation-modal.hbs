@@ -8,8 +8,10 @@
   >
     <button
       @click="modalOpen=true"
+      x-text="buttonText"
       class="inline-flex items-center gap-x-2 rounded-lg border border-transparent text-sm font-semibold text-teal-600 hover:text-teal-800 disabled:pointer-events-none disabled:opacity-50 dark:text-teal-500 dark:hover:text-teal-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
-    >Open</button>
+    >
+    </button>
     <template x-teleport="body">
       <div
         x-show="modalOpen"
@@ -39,7 +41,10 @@
           class="relative w-full border border-neutral-200 bg-white px-7 py-6 shadow-lg sm:max-w-lg sm:rounded-lg"
         >
           <div class="flex items-center justify-between pb-3">
-            <h3 x-text="modalTitle" class="text-lg font-semibold"></h3>
+            <h3
+              x-text="modalTitle"
+              class="text-lg font-semibold text-gray-900"
+            ></h3>
             <button
               @click="modalOpen=false"
               class="absolute right-0 top-0 mr-5 mt-5 flex h-8 w-8 items-center justify-center rounded-full text-gray-600 hover:bg-gray-50 hover:text-gray-800"
@@ -58,7 +63,7 @@
                 /></svg>
             </button>
           </div>
-          <div class="relative w-auto pb-8">
+          <div class="relative w-auto pb-8 text-gray-900">
             <p x-text="modalContent"></p>
           </div>
           <div
@@ -67,12 +72,12 @@
             <button
               @click="modalOpen=false"
               type="button"
-              class="inline-flex h-10 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-neutral-100 focus:ring-offset-2"
+              class="inline-flex h-10 items-center justify-center rounded-md border bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 focus:ring-offset-2"
             >Cancel</button>
             <button
               @click="modalOpen=false; confirmAction();"
               type="button"
-              class="inline-flex h-10 items-center justify-center rounded-md border border-transparent bg-neutral-950 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2"
+              class="inline-flex h-10 items-center justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
             >Confirm</button>
           </div>
         </div>

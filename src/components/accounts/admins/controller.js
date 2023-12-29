@@ -11,8 +11,8 @@ exports.renderAdminsList = async (req, res, next) => {
 
     const totalPages = Math.ceil(totalAdmins / newQuery.limit);
 
-    res.render("accounts/admins-list", {
-      title: "Accounts | Admins list",
+    res.render("accounts/admin-list", {
+      title: "Accounts | Admin list",
       adminsList: adminsList,
       query: newQuery,
       page: {

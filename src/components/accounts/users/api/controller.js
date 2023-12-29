@@ -20,3 +20,25 @@ exports.getUsersList = async (req, res, _) => {
     res.status(400).end();
   }
 };
+
+exports.banUser = async (req, res, _) => {
+  const { userId } = req.params;
+
+  try {
+    await usersService.updateUser(userId, { isBanned: true });
+    res.status(200).end();
+  } catch (err) {
+    res.status(400).end();
+  }
+};
+
+exports.unbanUser = async (req, res, _) => {
+  const { userId } = req.params;
+
+  try {
+    await usersService.updateUser(userId, { isBanned: false });
+    res.status(200).end();
+  } catch (err) {
+    res.status(400).end();
+  }
+};

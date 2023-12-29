@@ -8,23 +8,24 @@ const DEFAULT_LIST_LIMIT = 12;
 const UtcTimeField = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${user.createdAt})`;
 
 /**
- *
- * @param {Number} id
- * @param {Object} userData
+ * Update user account
+ * @param {number} id
+ * @param {object} userData
  * @param {string} [userData.email]
  * @param {string} [userData.password]
  * @param {string} [userData.fullName]
+ * @param {boolean} [userData.isBanned]
  * @returns
  */
 exports.updateUser = (id, userData) => {
-  db.update(user).set(userData).where(eq(user.id, id));
+  return db.update(user).set(userData).where(eq(user.id, id));
 };
 
-exports.genUserAvatarName = (req, res, next) => {
-  res.locals.imgNames = [`user-${req.params.userId}`];
-  next();
-};
-
+/**
+ * Get user account details
+ * @param {number} id
+ * @returns
+ */
 exports.getUserDetails = (id) => {
   const query = db
     .select({
@@ -33,6 +34,7 @@ exports.getUserDetails = (id) => {
       fullName: user.fullName,
       avatar: user.avatar,
       createdAt: UtcTimeField,
+      isBanned: user.isBanned,
     })
     .from(user)
     .where(eq(user.id, id))
@@ -91,6 +93,7 @@ exports.getUserList = (query) => {
       fullName: user.fullName,
       avatar: user.avatar,
       createdAt: UtcTimeField,
+      isBanned: user.isBanned,
     })
     .from(user)
     .where(and(...conditions))
@@ -160,10 +163,13 @@ const createConditionsList = (query) => {
  * @param {Number} [userData.address]
  */
 exports.updateUserProfile = async (id, userData) => {
-  await db.update(user).set({
-    email: userData.email,
-    fullName: userData.fullName,
-    avatar: userData.avatar,
-    addressId: userData.address,
-  }).where(eq(user.id, id));
+  await db
+    .update(user)
+    .set({
+      email: userData.email,
+      fullName: userData.fullName,
+      avatar: userData.avatar,
+      addressId: userData.address,
+    })
+    .where(eq(user.id, id));
 };
