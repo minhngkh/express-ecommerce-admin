@@ -1,5 +1,7 @@
-<button @click="$dispatch('notice', {type: 'error', text: '😵 Error!'})">Click
-  me</button>
+<button
+  @click="toast('Message', {type: 'success', description: 'short description', position: 'top-right'})"
+>
+  Click me</button>
 <div
   x-init="$store.sidebar.selected = 'Dashboard'"
   class="rounded-lg border-2 border-dashed border-gray-200 p-4 dark:border-gray-700"

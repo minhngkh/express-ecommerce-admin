@@ -14,16 +14,15 @@ passport.use(
       const account = {
         username: username,
       };
-      try {
-        const result = await adminsService.getAdminInfoFromUsername(username, [
-          "id",
-          "password",
-        ]);
 
-        Object.assign(account, result);
-      } catch (err) {
-        return cb(null, false, { message: "Incorrect username." });
-      }
+      const result = await adminsService.getAdminInfoFromUsername(username, [
+        "id",
+        "password",
+      ]);
+
+      if (!result) return cb(null, false, { message: "Incorrect username." });
+
+      Object.assign(account, result);
 
       bcrypt.compare(password, account.password, (err, result) => {
         if (err) {

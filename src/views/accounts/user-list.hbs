@@ -39,7 +39,6 @@
               <div class="relative max-w-xs">
                 <label class="sr-only">Search</label>
                 <input
-                  @pageshow.window="name = $el.value"
                   x-model="name"
                   :name="name ? 'name' : ''"
                   type="search"
@@ -98,7 +97,7 @@
 
             <button
               type="submit"
-              class="px-2 text-sm font-medium text-teal-500 underline-offset-2 hover:underline"
+              class="px-2 text-sm font-medium text-teal-600 underline-offset-2 hover:underline"
             >
               Apply
             </button>
@@ -201,12 +200,26 @@
                     <td
                       class="whitespace-nowrap px-6 py-4 text-center text-sm font-medium"
                     >
-                      <a
-                        :href="`/accounts/users/${user.id}`"
-                        type="button"
-                        target="_blank"
-                        class="inline-flex items-center gap-x-2 rounded-lg border border-transparent text-sm font-semibold text-teal-600 hover:text-teal-800 disabled:pointer-events-none disabled:opacity-50 dark:text-teal-500 dark:hover:text-teal-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
-                      >Details</a>
+                      <div class="flex items-center justify-center gap-x-4">
+                        <a
+                          :href="`/accounts/users/${user.id}`"
+                          type="button"
+                          target="_blank"
+                          class="inline-flex items-center gap-x-2 rounded-lg border border-transparent text-sm font-semibold text-teal-600 hover:text-teal-800 disabled:pointer-events-none disabled:opacity-50 dark:text-teal-500 dark:hover:text-teal-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+                        >Details</a>
+
+                        <div
+                          x-data="{
+                          modalTitle: 'Ban user account',
+                          modalContent: `Are you sure you want to ban user: ${user.fullName}?`,
+                          confirmAction() { 
+                            location.reload();
+                          }
+                        }"
+                        >
+                          {{#extend "confirmation_modal"}}{{/extend}}
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 </template>
@@ -339,7 +352,7 @@
             if (result.ok) {
               const data = await result.json();
 
-              history.pushState(data, "", `/accounts/users?${queryString}`);
+              history.pushState(data, "", window.location.href);
 
               this.total = data.total;
               this.current = data.current;
@@ -347,6 +360,7 @@
               return data.usersList;
             }
           } catch (err) {
+            toast("Something went wrong", { type: "error"})
             console.log(err);
           }
         }

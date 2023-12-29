@@ -27,15 +27,16 @@
       <title>Admin</title>
     {{/if}}
 
-    {{! <!-- Alpine Plugins -->
+    <!-- Alpine Plugins -->
     <script
-      src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"
-    ></script> }}
+      defer
+      src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.13.3/dist/cdn.min.js"
+    ></script>
 
     <!-- Alpine Core -->
     <script
       defer
-      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"
     ></script>
   </head>
   <body x-cloak x-data>
@@ -45,7 +46,7 @@
       {{{body}}}
     </div>
 
-    {{#extend "notification"}}{{/extend}}
+    {{#extend "toast"}}{{/extend}}
 
     {{! prettier-ignore}}
     <script>
@@ -58,7 +59,30 @@
               toggle() {
                   this.on = ! this.on
               }
-          })
+          });
+
+          window.toast = ('notify', (message, options = {}) => {
+            let description = '';
+            let type = 'default';
+            let position = 'bottom-right';
+            let html = '';
+            if(typeof options.description != 'undefined') description = options.description;
+            if(typeof options.type != 'undefined') type = options.type;
+            if(typeof options.position != 'undefined') position = options.position;
+            if(typeof options.html != 'undefined') html = options.html;
+            
+            window.dispatchEvent(new CustomEvent('toast-show', 
+              { 
+                detail : { 
+                  type: type, 
+                  message: message, 
+                  description: description, 
+                  position : position, 
+                  html: html 
+                }
+              }
+            ));
+          });
       })
 
       const toLocalDate = (time) => {

@@ -15,7 +15,7 @@
           <!-- Search & sort -->
           <form
             id="search-form"
-            x-data="{ name: '{{query.name}}', username: '{{query.username}}', sort: '{{query.username}}'}"
+            x-data="{ name: '{{query.name}}', username: '{{query.username}}', sort: '{{query.sort}}'}"
             action="/accounts/admins"
             method="get"
             class="m-0 flex items-center gap-x-4 p-3"
@@ -98,7 +98,7 @@
 
             <button
               type="submit"
-              class="px-2 text-sm font-medium text-teal-500 underline-offset-2 hover:underline"
+              class="px-2 text-sm font-medium text-teal-600 underline-offset-2 hover:underline"
             >
               Apply
             </button>

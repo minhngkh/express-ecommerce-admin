@@ -11,8 +11,8 @@ exports.renderUsersList = async (req, res, next) => {
 
     const totalPages = Math.ceil(totalUsers / newQuery.limit);
 
-    res.render("accounts/users-list", {
-      title: "Accounts | Users list",
+    res.render("accounts/user-list", {
+      title: "Accounts | User list",
       usersList: usersList,
       query: newQuery,
       page: {
