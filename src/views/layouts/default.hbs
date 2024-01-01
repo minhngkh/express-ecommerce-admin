@@ -1,3 +1,4 @@
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -51,39 +52,50 @@
     {{! prettier-ignore}}
     <script>
       document.addEventListener('alpine:init', () => {
-          Alpine.store('sidebar', {
-              on: false,
-              selected: null,
-              page: null,
-  
-              toggle() {
-                  this.on = ! this.on
-              }
-          });
+        Alpine.store('sidebar', {
+            on: false,
+            selected: null,
+            page: null,
 
-          window.toast = ('notify', (message, options = {}) => {
-            let description = '';
-            let type = 'default';
-            let position = 'bottom-right';
-            let html = '';
-            if(typeof options.description != 'undefined') description = options.description;
-            if(typeof options.type != 'undefined') type = options.type;
-            if(typeof options.position != 'undefined') position = options.position;
-            if(typeof options.html != 'undefined') html = options.html;
-            
-            window.dispatchEvent(new CustomEvent('toast-show', 
-              { 
-                detail : { 
-                  type: type, 
-                  message: message, 
-                  description: description, 
-                  position : position, 
-                  html: html 
-                }
-              }
-            ));
-          });
-      })
+            toggle() {
+                this.on = ! this.on
+            }
+        });
+
+        
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const toastParams = localStorage.getItem('toast');
+
+        if (toastParams) {
+          toast(...JSON.parse(toastParams));
+          localStorage.removeItem('toast');
+        }
+      });
+
+      const toast = ('notify', (message, options = {}) => {
+        let description = '';
+        let type = 'default';
+        let position = 'top-right';
+        let html = '';
+        if(typeof options.description != 'undefined') description = options.description;
+        if(typeof options.type != 'undefined') type = options.type;
+        if(typeof options.position != 'undefined') position = options.position;
+        if(typeof options.html != 'undefined') html = options.html;
+        
+        window.dispatchEvent(new CustomEvent('toast-show', 
+          { 
+            detail : { 
+              type: type, 
+              message: message, 
+              description: description, 
+              position : position, 
+              html: html 
+            }
+          }
+        ));
+      });
 
       const toLocalDate = (time) => {
         if (!time) {

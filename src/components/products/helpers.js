@@ -1,25 +1,38 @@
+const DefaultListLimit = 12;
+
+/**
+ *
+ * @param {Object} searchQuery
+ * @param {string} [searchQuery.category]
+ * @param {string} [searchQuery.subcategory]
+ * @param {string} [searchQuery.brand]
+ * @param {string} [searchQuery.status]
+ * @param {string} [searchQuery.name]
+ * @param {string} [searchQuery.limit]
+ * @param {string} [searchQuery.page]
+ * @param {string} [searchQuery.sort]
+ * @returns
+ */
 exports.processSearchQuery = (searchQuery) => {
   return {
-    categoryId: Object.hasOwn(searchQuery, "category")
-      ? Number(searchQuery.category)
+    categoryId: searchQuery.category ? Number(searchQuery.category) : null,
+
+    subcategoryIds: searchQuery.subcategory
+      ? searchQuery.subcategory.split(",").map((e) => Number(e))
       : null,
 
-    subcategoryId: Object.hasOwn(searchQuery, "subcategory")
-      ? Number(searchQuery.subcategory)
+    brandIds: searchQuery.brand
+      ? searchQuery.brand.split(",").map((e) => Number(e))
       : null,
 
-    brandId: Object.hasOwn(searchQuery, "brand")
-      ? Number(searchQuery.brand)
-      : null,
+    status: searchQuery.status ? searchQuery.status : null,
 
-    name: Object.hasOwn(searchQuery, "name") ? searchQuery.name : null,
+    name: searchQuery.name ? searchQuery.name : null,
 
-    limit: Object.hasOwn(searchQuery, "limit")
-      ? Number(searchQuery.limit)
-      : null,
+    limit: searchQuery.limit ? Number(searchQuery.limit) : DefaultListLimit,
 
-    page: Object.hasOwn(searchQuery, "page") ? Number(searchQuery.page) : null,
+    page: searchQuery.page ? Number(searchQuery.page) : 1,
 
-    sort: Object.hasOwn(searchQuery, "sort") ? searchQuery.sort : null,
+    sort: searchQuery.sort ? searchQuery.sort : null,
   };
 };

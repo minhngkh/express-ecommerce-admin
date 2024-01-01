@@ -1,40 +1,68 @@
-const { asc, and, desc, eq, like, sql } = require("drizzle-orm");
+const { asc, and, count, desc, eq, like, or, sql } = require("drizzle-orm");
 
 const db = require("#db/client");
 const {
+  laptopProduct,
+  phoneProduct,
   product,
   productBrand,
   productCategory,
   productImage,
   productSubcategory,
 } = require("#db/schema");
+const { omit } = require("#utils/objectHelpers");
 
 /**
  * @enum {string}
  */
 const ListOrder = {
-  CreationTimeAsc: "creationTime-asc",
-  CreationTimeDesc: "creationTime-desc",
+  CreationTimeAsc: "creation-asc",
+  CreationTimeDesc: "creation-desc",
   PriceAsc: "price-asc",
   PriceDesc: "price-desc",
-  TotalAsc: "total-asc",
-  TotalDesc: "total-desc",
+  PurchasesAsc: "purchases-asc",
+  PurchasesDesc: "purchases-desc",
+};
+
+const ProductStatus = {
+  OnStock: "On stock",
+  OutOfStock: "Out of stock",
+  Suspend: "Suspend",
+};
+
+const ProductExtendedTable = {
+  laptops: laptopProduct,
+  phones: phoneProduct,
 };
 
 /**
  * @typedef {Object} Query
- * @property {number} categoryId
- * @property {number} subcategoryId
- * @property {number} brandId
- * @property {string} name
+ * @property {?number} categoryId
+ * @property {?number[]} subcategoryIds
+ * @property {?number[]} brandIds
+ * @property {?string} status
+ * @property {?string} name
  * @property {number} limit
  * @property {number} page
- * @property {ListOrder} sort
+ * @property {?string} sort
  */
 
-const DefaultListLimit = 24;
-
 const ProductUtcCreatedAt = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${product.createdAt})`;
+
+exports.getTotalProducts = (query) => {
+  const conditions = createConditionsList(query);
+
+  const dbQuery = db
+    .select({
+      count: count(),
+    })
+    .from(product)
+    .where(and(...conditions));
+
+  return dbQuery.then((val) => {
+    return val[0].count;
+  });
+};
 
 // TODO: Total purchases sort
 /**
@@ -43,8 +71,8 @@ const ProductUtcCreatedAt = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${product.created
  * @returns
  */
 exports.getProducts = (query) => {
-  const isValid = processQuery(query);
-  if (!isValid) return [];
+  const { order } = processQuery(query);
+  if (order === null) return [];
 
   const conditions = createConditionsList(query);
 
@@ -63,7 +91,7 @@ exports.getProducts = (query) => {
     .from(product)
     .innerJoin(productCategory, eq(product.categoryId, productCategory.id))
     .innerJoin(productBrand, eq(product.brandId, productBrand.id))
-    .leftJoin(
+    .innerJoin(
       productSubcategory,
       eq(product.subcategoryId, productSubcategory.id),
     )
@@ -75,9 +103,43 @@ exports.getProducts = (query) => {
       ),
     )
     .where(and(...conditions))
-    .orderBy(query.sort)
+    .orderBy(order)
     .limit(query.limit)
     .offset((query.page - 1) * query.limit);
+};
+
+/**
+ * Get details of a product
+ * @param {keyof ProductExtendedTable} category
+ * @param {number} id
+ * @returns
+ */
+exports.getProductDetails = (category, id) => {
+  console.log(laptopProduct.$inferSelect());
+  const query = db
+    .select()
+    .from(product)
+    .innerJoin(
+      ProductExtendedTable[category],
+      eq(product.id, ProductExtendedTable[category].productId),
+    )
+    .innerJoin(productBrand, eq(product.brandId, productBrand.id))
+    .where(eq(product.id, id))
+    .limit(1);
+
+  return query.then((val) => {
+    if (!val.length) return null;
+
+    return {
+      id: val[0].product.id,
+      name: val[0].product.name,
+      price: val[0].product.price,
+      brand: val[0].product_brand.name,
+      status: val[0].product.status,
+      category: category,
+      details: Object.values(omit(val[0], ["product", "product_brand"]))[0],
+    };
+  });
 };
 
 /**
@@ -98,7 +160,7 @@ exports.addCategory = async (categoryData) => {
   await db.insert(productCategory).values({
     name: categoryData.name,
     description: categoryData.description ? categoryData.description : null,
-  })
+  });
 };
 
 /**
@@ -107,7 +169,10 @@ exports.addCategory = async (categoryData) => {
  * @returns
  */
 exports.getCategory = (categoryId) => {
-  return db.select().from(productCategory).where(eq(productCategory.id, categoryId));
+  return db
+    .select()
+    .from(productCategory)
+    .where(eq(productCategory.id, categoryId));
 };
 
 /**
@@ -116,13 +181,16 @@ exports.getCategory = (categoryId) => {
  * @param {Object} categoryData
  * @param {string} categoryData.name
  * @param {string} [categoryData.description]
-  */
+ */
 exports.updateCategory = async (categoryId, categoryData) => {
-  await db.update(productCategory).set({
-    name: categoryData.name,
-    description: categoryData.description ? categoryData.description : null,
-  }).where(eq(productCategory.id, categoryId));
-}
+  await db
+    .update(productCategory)
+    .set({
+      name: categoryData.name,
+      description: categoryData.description ? categoryData.description : null,
+    })
+    .where(eq(productCategory.id, categoryId));
+};
 
 /**
  * Delete a product category
@@ -130,15 +198,22 @@ exports.updateCategory = async (categoryId, categoryData) => {
  */
 exports.removeCategory = async (categoryId) => {
   await db.delete(productCategory).where(eq(productCategory.id, categoryId));
-}
+};
 
+/**
+ * Get list of subcategories
+ * @returns
+ */
+exports.getSubcategories = () => {
+  return db.select().from(productSubcategory);
+};
 
 /**
  * Get list of subcategories of a category
  * @param {Number} categoryId
  * @returns
  */
-exports.getSubcategories = (categoryId) => {
+exports.getSubcategoriesOfCategory = (categoryId) => {
   return db
     .select()
     .from(productSubcategory)
@@ -180,11 +255,16 @@ exports.getSubcategory = (subcategoryId) => {
  * @param {string} [subcategoryData.description]
  */
 exports.updateSubcategory = async (subcategoryId, subcategoryData) => {
-  await db.update(productSubcategory).set({
-    name: subcategoryData.name,
-    description: subcategoryData.description ? subcategoryData.description : null,
-  }).where(eq(productSubcategory.id, subcategoryId));
-}
+  await db
+    .update(productSubcategory)
+    .set({
+      name: subcategoryData.name,
+      description: subcategoryData.description
+        ? subcategoryData.description
+        : null,
+    })
+    .where(eq(productSubcategory.id, subcategoryId));
+};
 
 /**
  * Remove a subcategory
@@ -220,6 +300,28 @@ exports.getBrands = () => {
   return db.select().from(productBrand);
 };
 
+/** Get list of brands in a category
+ *
+ * @param {*} categoryId
+ * @returns
+ */
+exports.getBrandsInCategory = (categoryId) => {
+  const sq = db
+    .selectDistinct({
+      id: productBrand.id,
+    })
+    .from(product)
+    .where(eq(product.categoryId, categoryId))
+    .as("sq");
+
+  const query = db
+    .select()
+    .from(productBrand)
+    .innerJoin(sq, eq(productBrand.id, sq.id));
+
+  return query;
+};
+
 /**
  * Create a product brand
  * @param {Object} brandData
@@ -231,7 +333,7 @@ exports.addBrand = async (brandData) => {
     name: brandData.name,
     description: brandData.description ? brandData.description : null,
   });
-}
+};
 
 /**
  * Read a product brand
@@ -240,7 +342,7 @@ exports.addBrand = async (brandData) => {
  */
 exports.getBrand = (brandId) => {
   return db.select().from(productBrand).where(eq(productBrand.id, brandId));
-}
+};
 
 /**
  * Update a product brand
@@ -251,11 +353,14 @@ exports.getBrand = (brandId) => {
  * @returns
  */
 exports.updateBrand = async (brandId, brandData) => {
-  await db.update(productBrand).set({
-    name: brandData.name,
-    description: brandData.description ? brandData.description : null,
-  }).where(eq(productBrand.id, brandId));
-}
+  await db
+    .update(productBrand)
+    .set({
+      name: brandData.name,
+      description: brandData.description ? brandData.description : null,
+    })
+    .where(eq(productBrand.id, brandId));
+};
 
 /**
  * Delete a product brand
@@ -263,7 +368,7 @@ exports.updateBrand = async (brandId, brandData) => {
  */
 exports.removeBrand = async (brandId) => {
   await db.delete(productBrand).where(eq(productBrand.id, brandId));
-}
+};
 
 /**
  * Remove a brand
@@ -287,43 +392,35 @@ exports.removeBrand = (brandId, toRemoveProducts) => {
 /**
  * Validate and add default values to query
  * @param {Query} query
- * @returns {boolean} query validity
+ * @returns
  */
 const processQuery = (query) => {
-  if (query.limit !== null) {
-    if (!Number.isInteger(query.limit) || query.limit < 1) return false;
-  } else {
-    query.limit = DefaultListLimit;
-  }
-
-  if (query.page !== null) {
-    if (!Number.isInteger(query.page) || query.page < 1) return false;
-  } else {
-    query.page = 1;
-  }
+  const result = {
+    order: null,
+  };
 
   if (query.sort === null) {
-    query.sort = ListOrder.CreationTimeDesc;
+    result.order = desc(product.createdAt);
   } else {
     switch (query.sort) {
       case ListOrder.CreationTimeAsc:
-        query.sort = asc(product.createdAt);
+        result.order = asc(product.createdAt);
         break;
       case ListOrder.CreationTimeDesc:
-        query.sort = desc(product.createdAt);
+        result.order = desc(product.createdAt);
         break;
       case ListOrder.PriceAsc:
-        query.sort = asc(product.price);
+        result.order = asc(product.price);
         break;
       case ListOrder.PriceDesc:
-        query.sort = desc(product.price);
+        result.order = desc(product.price);
         break;
       default:
-        console.log(query.sort)
+        break;
     }
   }
 
-  return true;
+  return result;
 };
 
 /**
@@ -337,12 +434,29 @@ const createConditionsList = (query) => {
   if (query.categoryId !== null) {
     conditions.push(eq(product.categoryId, query.categoryId));
   }
-  if (query.subcategoryId !== null) {
-    conditions.push(eq(product.subcategoryId, query.subcategoryId));
+
+  if (query.subcategoryIds !== null) {
+    if (query.subcategoryIds.length === 1) {
+      conditions.push(eq(product.subcategoryId, query.subcategoryIds[0]));
+    } else {
+      conditions.push(
+        or(...query.subcategoryIds.map((s) => eq(product.subcategoryId, s))),
+      );
+    }
   }
-  if (query.brandId !== null) {
-    conditions.push(eq(product.brandId, query.brandId));
+
+  if (query.brandIds !== null) {
+    if (query.brandIds.length === 1) {
+      conditions.push(eq(product.brandId, query.brandIds[0]));
+    } else {
+      conditions.push(or(...query.brandIds.map((s) => eq(product.brandId, s))));
+    }
   }
+
+  if (query.status !== null) {
+    conditions.push(eq(product.status, query.status));
+  }
+
   if (query.name !== null) {
     conditions.push(like(product.name, `%${query.name}%`));
   }
@@ -375,10 +489,13 @@ exports.createOrder = async (orderData) => {
  * @param {string} status
  */
 exports.updateOrderStatus = async (orderId, status) => {
-  await db.update(order).set({
-    status: status,
-  }).where(eq(order.id, orderId));
-}
+  await db
+    .update(order)
+    .set({
+      status: status,
+    })
+    .where(eq(order.id, orderId));
+};
 
 /**
  * view order list
@@ -386,11 +503,8 @@ exports.updateOrderStatus = async (orderId, status) => {
  * @returns
  */
 exports.getOrders = (userId) => {
-  return db
-    .select()
-    .from(order)
-    .where(eq(order.userId, userId));
-}
+  return db.select().from(order).where(eq(order.userId, userId));
+};
 
 /**
  * Get order detail
@@ -398,8 +512,5 @@ exports.getOrders = (userId) => {
  * @returns
  */
 exports.getOrder = (orderId) => {
-  return db
-    .select()
-    .from(order)
-    .where(eq(order.id, orderId));
+  return db.select().from(order).where(eq(order.id, orderId));
 };

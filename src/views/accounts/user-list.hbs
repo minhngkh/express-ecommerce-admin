@@ -20,6 +20,7 @@
             method="get"
             class="m-0 flex items-center gap-x-4 p-3"
           >
+            <!-- Sort -->
             <div class="relative">
               <select
                 x-model="sort"
@@ -34,7 +35,9 @@
                 <option value="regTime-desc">Registration time (desc)</option>
               </select>
             </div>
+            <!-- Sort -->
 
+            <!-- Search: name -->
             <div>
               <div class="relative max-w-xs">
                 <label class="sr-only">Search</label>
@@ -64,7 +67,9 @@
                 </div>
               </div>
             </div>
+            <!-- Search: name -->
 
+            <!-- Search: email -->
             <div class="">
               <div class="relative max-w-xs">
                 <label class="sr-only">Search</label>
@@ -94,6 +99,7 @@
                 </div>
               </div>
             </div>
+            <!-- Search: email -->
 
             <button
               type="submit"
@@ -108,32 +114,33 @@
           <!-- Table -->
           <div class="overflow-hidden">
             <table
-              class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+              class="min-w-full table-fixed divide-y divide-gray-200 dark:divide-gray-700"
             >
               <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  {{! <th
-                    scope="col"
-                    class="w-16 py-3 pl-6 text-center text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
-                  ></th> }}
                   <th
                     scope="col"
                     class="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
                   >Full name</th>
+
                   <th
                     scope="col"
                     class="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
                   >Email</th>
+
                   <th
                     scope="col"
                     class="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
                   >Registration time</th>
+
                   <th
                     scope="col"
                     class="px-6 py-3 text-center text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
                   >Status</th>
+
                   <th
                     scope="col"
+                    colspan="2"
                     class="px-6 py-3 text-center text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
                   >Action</th>
                 </tr>
@@ -206,28 +213,29 @@
                       class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-800 dark:text-gray-200"
                     ></td>
                     <td
-                      class="whitespace-nowrap px-6 py-4 text-center text-sm font-medium"
+                      class="w-24 whitespace-nowrap py-4 pl-6 text-center text-sm font-medium"
                     >
-                      <div class="flex items-center justify-center gap-x-4">
-                        <a
-                          :href="`/accounts/users/${user.id}`"
-                          type="button"
-                          target=""
-                          class="inline-flex items-center gap-x-2 rounded-lg border border-transparent text-sm font-semibold text-teal-600 hover:text-teal-800 disabled:pointer-events-none disabled:opacity-50 dark:text-teal-500 dark:hover:text-teal-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
-                        >Details</a>
-
-                        <div
-                          x-data="{
-                            modalTitle: 'Ban user account',
-                            modalContent: `Are you sure you want to ban this user?`,
-                            get buttonText() { return user.isBanned ? 'Unban' : 'Ban'; },
-                            async confirmAction() { 
-                              await $store.users[user.isBanned ? 'unban' : 'ban'](user.id);
-                            },
-                          }"
-                        >
-                          {{#extend "confirmation_modal"}}{{/extend}}
-                        </div>
+                      <a
+                        :href="`/accounts/users/${user.id}`"
+                        type="button"
+                        target=""
+                        class="inline-flex items-center rounded-lg border border-transparent px-2 text-sm font-semibold text-teal-600 hover:text-teal-800 disabled:pointer-events-none disabled:opacity-50 dark:text-teal-500 dark:hover:text-teal-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+                      >Details</a>
+                    </td>
+                    <td
+                      class="w-24 whitespace-nowrap py-4 pr-6 text-center text-sm text-gray-800 dark:text-gray-200"
+                    >
+                      <div
+                        x-data="{
+                          get modalTitle() { return `${user.isBanned ? 'Unban' : 'Ban'} user account`; },
+                          get modalContent() { return `Are you sure you want to ${user.isBanned ? 'unban' : 'ban'} this user?` },
+                          get buttonText() { return user.isBanned ? 'Unban' : 'Ban'; },
+                          async confirmAction() { 
+                            await $store.users[user.isBanned ? 'unban' : 'ban'](user.id);
+                          },
+                        }"
+                      >
+                        {{#extend "confirmation_modal"}}{{/extend}}
                       </div>
                     </td>
                   </tr>

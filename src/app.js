@@ -15,6 +15,7 @@ const accountsApiRouter = require("#components/accounts/api/router");
 const accountsRouter = require("#components/accounts/router");
 const authRouter = require("#components/auth/router");
 const homeRouter = require("#components/home/router");
+const productsRouter = require("#components/products/router");
 const testRouter = require("#components/test/router");
 
 // Init Express app
@@ -57,6 +58,7 @@ app.use("/api/accounts", accountsApiRouter);
 
 app.use("/", homeRouter);
 app.use("/accounts", accountsRouter);
+app.use("/products", productsRouter);
 
 app.use("/test", testRouter);
 

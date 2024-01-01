@@ -1,5 +1,9 @@
 <button
-  @click="toast('Message', {type: 'success', description: 'short description', position: 'top-right'})"
+  @click="
+    const toastParams = ['Message', {type: 'success', description: 'short description', position: 'top-right'}];
+    localStorage.setItem('toast', JSON.stringify(toastParams));
+    location.reload();
+  "
 >
   Click me</button>
 <div
