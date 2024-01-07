@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.get("/", adminsController.renderAdminsList);
 
-router.get("/:username", adminsController.renderAminDetails);
+router.get("/:id", adminsController.renderAminDetails);
+
+router.get("/:id/edit", adminsController.renderEditPage);
 
 module.exports = router;

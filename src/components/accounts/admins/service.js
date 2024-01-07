@@ -2,21 +2,21 @@ const bcrypt = require("bcrypt");
 const { and, asc, count, desc, eq, like, sql } = require("drizzle-orm");
 
 const db = require("#db/client");
-const { admins } = require("#db/schema");
+const { admin } = require("#db/schema");
 const { inclusivePick } = require("#utils/objectHelpers");
 
 const SALT_ROUNDS = 10;
 
 const DEFAULT_LIST_LIMIT = 12;
 
-const UtcTimeField = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${admins.createdAt})`;
+const UtcTimeField = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${admin.createdAt})`;
 
 const AdminFields = {
-  id: admins.id,
-  username: admins.username,
-  password: admins.password,
-  fullName: admins.fullName,
-  createdAt: admins.createdAt,
+  id: admin.id,
+  username: admin.username,
+  password: admin.password,
+  name: admin.name,
+  createdAt: admin.createdAt,
 };
 
 /** Get all admin info from username
@@ -27,8 +27,8 @@ const AdminFields = {
 exports.getAllAdminInfoFromUsername = (username) => {
   const query = db
     .select(AdminFields)
-    .from(admins)
-    .where(eq(admins.username, username))
+    .from(admin)
+    .where(eq(admin.username, username))
     .limit(1);
 
   return query.then((val) => {
@@ -45,8 +45,8 @@ exports.getAllAdminInfoFromUsername = (username) => {
 exports.getAdminInfoFromUsername = (username, fields) => {
   const query = db
     .select(inclusivePick(AdminFields, fields))
-    .from(admins)
-    .where(eq(admins.username, username))
+    .from(admin)
+    .where(eq(admin.username, username))
     .limit(1);
 
   return query.then((val) => {
@@ -62,8 +62,8 @@ exports.getAdminInfoFromUsername = (username, fields) => {
 exports.existsAdmin = (username) => {
   const query = db
     .select({ 1: sql`1` })
-    .from(admins)
-    .where(eq(admins.username, username))
+    .from(admin)
+    .where(eq(admin.username, username))
     .limit(1);
 
   return query.then((val) => {
@@ -71,16 +71,16 @@ exports.existsAdmin = (username) => {
   });
 };
 
-exports.getAdminDetails = (username) => {
+exports.getAdminDetails = (id) => {
   const query = db
     .select({
-      id: admins.id,
-      username: admins.username,
-      fullName: admins.fullName,
+      id: admin.id,
+      username: admin.username,
+      name: admin.name,
       createdAt: UtcTimeField,
     })
-    .from(admins)
-    .where(eq(admins.username, username))
+    .from(admin)
+    .where(eq(admin.id, id))
     .limit(1);
 
   return query.then((val) => {
@@ -91,7 +91,7 @@ exports.getAdminDetails = (username) => {
 /** Create admin
  *
  * @param {Object} adminData
- * @param {string} adminData.fullName
+ * @param {string} adminData.name
  * @param {string} adminData.username
  * @param {string} adminData.password
  * @returns
@@ -99,13 +99,13 @@ exports.getAdminDetails = (username) => {
 exports.createAdmin = (adminData) => {
   return bcrypt.hash(adminData.password, SALT_ROUNDS).then((hash) => {
     const query = db
-      .insert(admins)
+      .insert(admin)
       .values({
-        fullName: adminData.fullName,
+        name: adminData.name,
         username: adminData.username,
         password: hash,
       })
-      .returning({ insertedId: admins.id });
+      .returning({ insertedId: admin.id });
 
     return query.then((val) => {
       return val[0].insertedId;
@@ -119,7 +119,7 @@ exports.getTotalAdmins = (query) => {
     .select({
       count: count(),
     })
-    .from(admins)
+    .from(admin)
     .where(and(...conditions));
 
   return dbQuery.then((val) => val[0].count);
@@ -133,22 +133,22 @@ exports.getAdminsList = (query) => {
   let order;
   switch (query.sort) {
     case "name-asc":
-      order = asc(admins.fullName);
+      order = asc(admin.name);
       break;
     case "name-desc":
-      order = desc(admins.fullName);
+      order = desc(admin.name);
       break;
     case "username-asc":
-      order = asc(admins.username);
+      order = asc(admin.username);
       break;
     case "username-desc":
-      order = desc(admins.username);
+      order = desc(admin.username);
       break;
     case "regTime-asc":
-      order = asc(admins.createdAt);
+      order = asc(admin.createdAt);
       break;
     case "regTime-desc":
-      order = desc(admins.createdAt);
+      order = desc(admin.createdAt);
       break;
     default:
       return [];
@@ -156,12 +156,12 @@ exports.getAdminsList = (query) => {
 
   return db
     .select({
-      id: admins.id,
-      username: admins.username,
-      fullName: admins.fullName,
+      id: admin.id,
+      username: admin.username,
+      name: admin.name,
       createdAt: UtcTimeField,
     })
-    .from(admins)
+    .from(admin)
     .where(and(...conditions))
     .orderBy(order)
     .limit(query.limit)
@@ -208,12 +208,23 @@ const createConditionsList = (query) => {
   const conditions = [];
 
   if (Object.hasOwn(query, "name")) {
-    conditions.push(like(admins.fullName, `%${query.name}%`));
+    conditions.push(like(admin.name, `%${query.name}%`));
   }
 
   if (Object.hasOwn(query, "username")) {
-    conditions.push(like(admins.username, `%${query.username}%`));
+    conditions.push(like(admin.username, `%${query.username}%`));
   }
 
   return conditions;
+};
+
+/**
+ * Update admin profile
+ * @param {Number} id
+ * @param {Object} adminData
+ * @param {string} adminData.name
+ * @returns
+ */
+exports.updateAdmin = async (id, adminData) => {
+  return db.update(admin).set(adminData).where(eq(admin.id, id));
 };

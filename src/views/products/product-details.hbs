@@ -1,0 +1,612 @@
+<main>
+  <div class="p-6">
+    <h2
+      class="mb-8 p-1 text-center text-xl font-bold text-gray-900 dark:text-white"
+    >
+      Product details
+    </h2>
+
+    <div class="flex justify-center lg:pr-12">
+
+      <div x-data="{ loading: false }">
+        <!-- General info -->
+        <form
+          @submit.prevent
+          name="generalForm"
+          class="grid max-w-screen-xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-4 sm:px-1 md:grid-cols-3"
+        >
+
+          <div id="personal-information">
+            <h2 class="text-base font-semibold leading-7 text-gray-900">
+              Product information
+            </h2>
+            <p class="tex-gray-700 mt-1 text-sm leading-6">
+              Add product general information
+            </p>
+          </div>
+          <div class="col-span-2">
+            <div
+              class="grid grid-cols-1 gap-x-6 gap-y-6 sm:max-w-xl sm:grid-cols-6"
+            >
+              <div class="col-span-full">
+                <label
+                  for="name"
+                  class="block text-sm font-medium leading-6 text-gray-900"
+                >Name
+                </label>
+                <div class="mt-2">
+                  <input
+                    :disabled="loading"
+                    required
+                    value="{{product.name}}"
+                    id="name"
+                    name="name"
+                    type="text"
+                    autocomplete="off"
+                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+
+              <div class="col-span-2">
+                <div class="relative">
+                  <label
+                    for="categoryId"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Category
+                  </label>
+                  <div class="mt-2">
+                    <select
+                      disabled
+                      id="categoryId"
+                      x-model="$store.product.categoryId"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    >
+                      {{#each options.categories}}
+                        <option value="{{id}}">{{name}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-span-2">
+                <div class="relative">
+                  <label
+                    for="subcategoryId"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Subcategory
+                  </label>
+                  <div class="mt-2">
+                    <select
+                      :disabled="loading"
+                      id="subcategoryId"
+                      x-model="$store.product.subcategoryId"
+                      name="subcategoryId"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    >
+                      {{#each options.subcategories}}
+                        <option value="{{id}}">{{name}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-span-2">
+                <div class="relative">
+                  <label
+                    for="brandId"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Brand
+                  </label>
+                  <div class="mt-2">
+                    <select
+                      :disabled="loading"
+                      id="brandId"
+                      x-model="$store.product.brandId"
+                      name="brandId"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    >
+                      {{#each options.brands}}
+                        <option value="{{id}}">{{name}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-span-2">
+                <div class="relative">
+                  <label
+                    for="status"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Status
+                  </label>
+                  <div class="mt-2">
+                    <select
+                      :disabled="loading"
+                      id="status"
+                      x-model="$store.product.status"
+                      name="status"
+                      class="block w-full rounded-md border-0 py-1.5 capitalize text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    >
+                      {{#each options.statuses}}
+                        <option
+                          value="{{this}}"
+                          class="capitalize"
+                        >{{this}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-span-4">
+                <label
+                  for="price"
+                  class="block text-sm font-medium leading-6 text-gray-900"
+                >Price
+                </label>
+                <div class="relative mt-2">
+                  <input
+                    :disabled="loading"
+                    required
+                    x-model.number="$store.product.price"
+                    id="price"
+                    type="number"
+                    name="price"
+                    autocomplete="off"
+                    class="block w-full rounded-md border-0 py-1.5 ps-16 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                  />
+
+                  <div
+                    class="pointer-events-none absolute inset-y-0 start-0 z-20 flex translate-y-[1px] items-center ps-4"
+                  >
+                    <span class="text-gray-500">VND</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        <!-- End general info -->
+
+        <!-- Detailed specs -->
+        <template x-if="'{{category}}' === 'laptops'">
+          <form
+            @submit.prevent
+            name="laptopForm"
+            class="grid max-w-screen-xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-1 md:grid-cols-3"
+          >
+            <div id="personal-information">
+              <h2 class="text-base font-semibold leading-7 text-gray-900">
+                Laptop specifications
+              </h2>
+              <p class="tex-gray-700 mt-1 text-sm leading-6">
+                Add product detailed specifications
+              </p>
+            </div>
+
+            <div class="col-span-2">
+              <div
+                class="grid grid-cols-1 gap-x-6 gap-y-6 sm:max-w-xl sm:grid-cols-6"
+              >
+                <div class="col-span-2">
+                  <label
+                    for="screenSize"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Screen size
+                  </label>
+                  <div class="mt-2">
+                    <input
+                      :disabled="loading"
+                      required
+                      value="{{product.specs.screenSize}}"
+                      id="screenSize"
+                      type="text"
+                      name="screenSize"
+                      autocomplete="off"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-span-2">
+                  <label
+                    for="resolution"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Resolution
+                  </label>
+                  <div class="mt-2">
+                    <input
+                      :disabled="loading"
+                      required
+                      value="{{product.specs.resolution}}"
+                      id="resolution"
+                      type="text"
+                      name="resolution"
+                      autocomplete="off"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-span-2">
+                  <label
+                    for="cpu"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >CPU
+                  </label>
+                  <div class="mt-2">
+                    <input
+                      :disabled="loading"
+                      required
+                      value="{{product.specs.cpu}}"
+                      id="cpu"
+                      type="text"
+                      name="cpu"
+                      autocomplete="off"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-span-2">
+                  <label
+                    for="gpu"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >GPU
+                  </label>
+                  <div class="mt-2">
+                    <input
+                      :disabled="loading"
+                      required
+                      value="{{product.specs.gpu}}"
+                      id="gpu"
+                      type="text"
+                      name="gpu"
+                      autocomplete="off"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-span-2">
+                  <label
+                    for="ram"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >RAM
+                  </label>
+                  <div class="mt-2">
+                    <input
+                      :disabled="loading"
+                      required
+                      value="{{product.specs.ram}}"
+                      id="ram"
+                      type="text"
+                      name="ram"
+                      autocomplete="off"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-span-2">
+                  <label
+                    for="storage"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Storage
+                  </label>
+                  <div class="mt-2">
+                    <input
+                      :disabled="loading"
+                      required
+                      value="{{product.specs.storage}}"
+                      id="storage"
+                      type="text"
+                      name="storage"
+                      autocomplete="off"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-span-full">
+                  <label
+                    for="ports"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Ports
+                  </label>
+                  <div class="mt-2">
+                    <textarea
+                      :disabled="loading"
+                      required
+                      id="ports"
+                      name="ports"
+                      class="block w-full rounded-lg border-gray-200 px-4 py-3 text-sm focus:border-teal-600 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
+                      rows="4"
+                    >{{product.specs.ports}}</textarea>
+                  </div>
+                </div>
+
+                <div class="mt-10">
+                  <button
+                    @click="loading=true; await $store.product.submit(); loading=false;"
+                    type="button"
+                    class="grid h-9 w-16 place-content-center rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700 dark:hover:bg-teal-500"
+                    x-html="loading ? 
+                `<div class='animate-spin h-4 w-4 border-[3px] border-current border-t-transparent text-white rounded-full dark:text-white' role='status' aria-label='loading'>
+                  <span class='sr-only'>Loading...</span>
+                </div>` : 'Update'"
+                  >
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </template>
+
+        <template x-if="$store.product.categoryId == 1">
+          <form
+            @submit.prevent
+            name="phoneForm"
+            class="grid max-w-screen-xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-4 sm:px-1 md:grid-cols-3"
+          >
+            <div id="personal-information">
+              <h2 class="text-base font-semibold leading-7 text-gray-900">
+                Phone specifications
+              </h2>
+              <p class="tex-gray-700 mt-1 text-sm leading-6">
+                Add product detailed specifications
+              </p>
+            </div>
+
+            <div class="col-span-2">
+              <div
+                class="grid grid-cols-1 gap-x-6 gap-y-6 sm:max-w-xl sm:grid-cols-6"
+              >
+                <div class="col-span-2">
+                  <label
+                    for="screenSize"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Screen size
+                  </label>
+                  <div class="mt-2">
+                    <input
+                      :disabled="loading"
+                      required
+                      id="screenSize"
+                      value="{{product.specs.screenSize}}"
+                      type="text"
+                      name="screenSize"
+                      autocomplete="off"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-span-2">
+                  <label
+                    for="resolution"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Resolution
+                  </label>
+                  <div class="mt-2">
+                    <input
+                      :disabled="loading"
+                      required
+                      id="resolution"
+                      value="{{product.specs.resolution}}"
+                      type="text"
+                      name="resolution"
+                      autocomplete="off"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-span-2">
+                  <label
+                    for="battery"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Battery
+                  </label>
+                  <div class="mt-2">
+                    <input
+                      :disabled="loading"
+                      required
+                      id="battery"
+                      value="{{product.specs.battery}}"
+                      type="text"
+                      name="battery"
+                      autocomplete="off"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-span-2">
+                  <label
+                    for="chip"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Chip
+                  </label>
+                  <div class="mt-2">
+                    <input
+                      :disabled="loading"
+                      required
+                      id="chip"
+                      value="{{product.specs.chip}}"
+                      type="text"
+                      name="chip"
+                      autocomplete="off"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-span-2">
+                  <label
+                    for="ram"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >RAM
+                  </label>
+                  <div class="mt-2">
+                    <input
+                      :disabled="loading"
+                      required
+                      id="ram"
+                      value="{{product.specs.ram}}"
+                      type="text"
+                      name="ram"
+                      autocomplete="off"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-span-2">
+                  <label
+                    for="storage"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Storage
+                  </label>
+                  <div class="mt-2">
+                    <input
+                      :disabled="loading"
+                      required
+                      id="storage"
+                      value="{{product.specs.storage}}"
+                      type="text"
+                      name="storage"
+                      autocomplete="off"
+                      class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 disabled:bg-black/5 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-span-full">
+                  <label
+                    for="frontCamera"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >frontCamera
+                  </label>
+                  <div class="mt-2">
+                    <textarea
+                      :disabled="loading"
+                      required
+                      id="frontCamera"
+                      name="frontCamera"
+                      class="block w-full rounded-lg border-gray-200 px-4 py-3 text-sm focus:border-teal-600 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
+                      rows="1"
+                    >{{product.specs.frontCamera}}</textarea>
+                  </div>
+                </div>
+
+                <div class="col-span-full">
+                  <label
+                    for="rearCamera"
+                    class="block text-sm font-medium leading-6 text-gray-900"
+                  >Rear camera
+                  </label>
+                  <div class="mt-2">
+                    <textarea
+                      :disabled="loading"
+                      required
+                      id="rearCamera"
+                      name="rearCamera"
+                      class="block w-full rounded-lg border-gray-200 px-4 py-3 text-sm focus:border-teal-600 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
+                      rows="3"
+                    >{{product.specs.rearCamera}}</textarea>
+                  </div>
+                </div>
+
+                <div class="mt-10">
+                  <button
+                    @click="loading=true; await $store.product.submit(); loading=false;"
+                    type="button"
+                    class="grid h-9 w-16 place-content-center rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700 dark:hover:bg-teal-500"
+                    x-html="loading ? 
+                `<div class='animate-spin h-4 w-4 border-[3px] border-current border-t-transparent text-white rounded-full dark:text-white' role='status' aria-label='loading'>
+                  <span class='sr-only'>Loading...</span>
+                </div>` : 'Update'"
+                  >
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </form>
+        </template>
+        <!-- End detailed specs -->
+      </div>
+    </div>
+  </div>
+</main>
+
+{{! prettier-ignore}}
+{{#content "script"}}
+<script>
+  document.addEventListener("alpine:init",  () => {
+    Alpine.store('product', {
+      id: {{product.id}},
+      categoryId: {{product.categoryId}},
+      subcategoryId: {{product.subcategoryId}},
+      brandId: {{product.brandId}},
+      status: '{{product.status}}',
+      price: {{product.price}},
+
+      async submit() {
+        const { generalForm, laptopForm, phoneForm } = document.forms;
+        if (!generalForm.reportValidity()) return;
+        if (laptopForm) 
+          if (!laptopForm.reportValidity()) return;
+        if (phoneForm) 
+          if (!phoneForm.reportValidity()) return;
+
+        if (!Number.isInteger(this.price) || this.price < 0) {
+          toast('Invalid price', {type: 'danger'} );
+          return;
+        }
+
+        const data = {
+          categoryId: this.categoryId,
+          ...Object.fromEntries(new FormData(generalForm)),
+          specs: {
+            ...(laptopForm ? Object.fromEntries(new FormData(laptopForm)) : {}),
+            ...(phoneForm ? Object.fromEntries(new FormData(phoneForm)) : {}),
+          },
+        }
+
+        try {
+          const response = await fetch(`/api/products/${this.id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          });
+
+          if (!response.ok) {
+            const { error } = await response.json();
+            toast(error.message, {type: error.type} );
+            return;
+          }
+
+          localStorage.setItem('toast', JSON.stringify([
+            'Product updated successfully', 
+            {type: 'success'}
+          ]));
+          window.location.replace('/products');
+          return;
+        } catch (err) {
+          toast("Cannot communicate with server. Please try again", {type: 'danger'} );
+          return;
+        }
+      }
+    });
+  });
+
+</script>
+{{/content}}

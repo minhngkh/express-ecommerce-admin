@@ -6,8 +6,7 @@
     "db:generate": "drizzle-kit generate:sqlite",
     "db:push": "drizzle-kit push:sqlite",
     "db:browser": "drizzle-kit studio",
-    "db:local:sync": "cross-env DB=local node scripts/sync-local-db.js",
-    "db:local:push": "drizzle-kit generate:sqlite --config=drizzle/localdb.config.js",
+    "db:local:push": "drizzle-kit push:sqlite --config=drizzle/localdb.config.js",
     "db:local:browser": "drizzle-kit studio --config=drizzle/localdb.config.js",
     "css:build": "tailwindcss -i public/styles/tailwind.css -o public/styles/style.css",
     "css:watch": "tailwindcss -i public/styles/tailwind.css -o public/styles/style.css --watch",
@@ -21,6 +20,7 @@
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
     "bcrypt": "^5.1.1",
+    "chartjs": "^0.3.24",
     "cloudinary": "^1.41.1",
     "connect-redis": "^7.1.0",
     "debug": "^4.3.4",
@@ -44,7 +44,6 @@
     "dotenv": "^16.3.1",
     "drizzle-kit": "^0.20.7",
     "eslint": "^8.55.0",
-    "handlebars-layout": "^0.1.4",
     "nodemon": "^3.0.2",
     "prettier": "^3.1.0",
     "prettier-plugin-tailwindcss": "^0.5.7"
@@ -52,6 +51,7 @@
   "imports": {
     "#components/*": "./src/components/*.js",
     "#db/*": "./src/db/*.js",
+    "#lib/*": "./src/lib/*.js",
     "#middlewares/*": "./src/middlewares/*.js",
     "#utils/*": "./src/utils/*.js"
   }

@@ -1,3 +1,4 @@
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -27,15 +28,16 @@
       <title>Admin</title>
     {{/if}}
 
-    {{! <!-- Alpine Plugins -->
+    <!-- Alpine Plugins -->
     <script
-      src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"
-    ></script> }}
+      defer
+      src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.13.3/dist/cdn.min.js"
+    ></script>
 
     <!-- Alpine Core -->
     <script
       defer
-      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"
     ></script>
   </head>
   <body x-cloak x-data>
@@ -45,21 +47,55 @@
       {{{body}}}
     </div>
 
-    {{#extend "notification"}}{{/extend}}
+    {{#extend "toast"}}{{/extend}}
 
     {{! prettier-ignore}}
     <script>
       document.addEventListener('alpine:init', () => {
-          Alpine.store('sidebar', {
-              on: false,
-              selected: null,
-              page: null,
-  
-              toggle() {
-                  this.on = ! this.on
-              }
-          })
-      })
+        Alpine.store('sidebar', {
+            on: false,
+            selected: null,
+            page: null,
+
+            toggle() {
+                this.on = ! this.on
+            }
+        });
+
+        
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const toastParams = localStorage.getItem('toast');
+
+        if (toastParams) {
+          toast(...JSON.parse(toastParams));
+          localStorage.removeItem('toast');
+        }
+      });
+
+      const toast = ('notify', (message, options = {}) => {
+        let description = '';
+        let type = 'default';
+        let position = 'top-right';
+        let html = '';
+        if(typeof options.description != 'undefined') description = options.description;
+        if(typeof options.type != 'undefined') type = options.type;
+        if(typeof options.position != 'undefined') position = options.position;
+        if(typeof options.html != 'undefined') html = options.html;
+        
+        window.dispatchEvent(new CustomEvent('toast-show', 
+          { 
+            detail : { 
+              type: type, 
+              message: message, 
+              description: description, 
+              position : position, 
+              html: html 
+            }
+          }
+        ));
+      });
 
       const toLocalDate = (time) => {
         if (!time) {
@@ -69,6 +105,12 @@
         const date = new Date(time);
         return date.toISOString().replace("T"," ").substring(0, 19);
       }
+
+      const currencyFormatter = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      });
+
     </script>
 
     {{#block "script"}}{{/block}}

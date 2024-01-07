@@ -1,9 +1,9 @@
 <main
-  x-init="$store.sidebar.selected = 'Accounts'; $store.sidebar.page='Users'"
+  x-init="$store.sidebar.selected = 'Accounts'; $store.sidebar.page='Admins'"
   class="p-6"
 >
   <h2 class="mb-8 p-1 text-xl font-bold text-gray-900 dark:text-white">
-    User list
+    Admins list
   </h2>
 
   <div class="flex flex-col">
@@ -15,8 +15,8 @@
           <!-- Search & sort -->
           <form
             id="search-form"
-            x-data="{ name: '{{query.name}}', email: '{{query.email}}', sort: '{{query.sort}}'}"
-            action="/accounts/users"
+            x-data="{ name: '{{query.name}}', username: '{{query.username}}', sort: '{{query.sort}}'}"
+            action="/accounts/admins"
             method="get"
             class="m-0 flex items-center gap-x-4 p-3"
           >
@@ -28,8 +28,8 @@
               >
                 <option value="name-asc">Name (asc)</option>
                 <option value="name-desc">Name (desc)</option>
-                <option value="email-asc">Email (asc)</option>
-                <option value="email-desc">Email (desc)</option>
+                <option value="username-asc">Username (asc)</option>
+                <option value="username-desc">Username (desc)</option>
                 <option value="regTime-asc">Registration time (asc)</option>
                 <option value="regTime-desc">Registration time (desc)</option>
               </select>
@@ -70,11 +70,11 @@
               <div class="relative max-w-xs">
                 <label class="sr-only">Search</label>
                 <input
-                  x-model="email"
-                  :name="email ? 'email' : ''"
+                  x-model="username"
+                  :name="username ? 'username' : ''"
                   type="search"
                   class="block w-full rounded-lg border-gray-200 px-3 py-2 ps-9 text-sm shadow-sm focus:z-10 focus:border-teal-500 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
-                  placeholder="Email"
+                  placeholder="Username"
                 />
                 <div
                   class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3"
@@ -98,7 +98,7 @@
 
             <button
               type="submit"
-              class="px-2 text-sm font-medium text-teal-500 underline-offset-2 hover:underline"
+              class="px-2 text-sm font-medium text-teal-600 underline-offset-2 hover:underline"
             >
               Apply
             </button>
@@ -120,11 +120,11 @@
                   <th
                     scope="col"
                     class="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
-                  >Full name</th>
+                  >Name</th>
                   <th
                     scope="col"
                     class="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
-                  >Email</th>
+                  >Username</th>
                   <th
                     scope="col"
                     class="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
@@ -136,7 +136,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                <template x-for="user in $store.users.list" :key="user.id">
+                <template x-for="admin in $store.admins.list" :key="admin.id">
                   <tr>
                     {{! <td
                       class="whitespace-nowrap pl-6 text-center text-sm text-gray-800 dark:text-gray-200"
@@ -144,74 +144,31 @@
                       
                     </td> }}
                     <td
+                      x-text="admin.name"
                       class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-800 dark:text-gray-200"
                     >
-                      <div class="flex items-center gap-x-4">
-                        <template x-if="user.avatar">
-                          <img
-                            class="h-8 w-8 rounded-full"
-                            :src="user.avatar"
-                            alt="Bordered avatar"
-                          />
-                        </template>
-                        <template x-if="!user.avatar">
-                          <svg
-                            class="h-8 w-8"
-                            xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink"
-                            version="1.1"
-                            viewBox="0 0 600 600"
-                            fill="white"
-                          >
-                            <defs>
-                              <clipPath id="circular-border">
-                                <circle cx="300" cy="300" r="280" />
-                              </clipPath>
-                              <clipPath id="avoid-antialiasing-bugs">
-                                <rect width="100%" height="498" />
-                              </clipPath>
-                            </defs>
-                            <circle
-                              cx="300"
-                              cy="300"
-                              r="280"
-                              fill="gray"
-                              clip-path="url(#avoid-antialiasing-bugs)"
-                            />
-                            <circle cx="300" cy="230" r="115" />
-                            <circle
-                              cx="300"
-                              cy="550"
-                              r="205"
-                              clip-path="url(#circular-border)"
-                            />
-                          </svg>
-                        </template>
-                        <p x-text="user.fullName"></p>
-                      </div>
                     </td>
                     <td
-                      x-text="user.email"
+                      x-text="admin.username"
                       class="whitespace-nowrap px-6 py-4 text-sm text-gray-800 dark:text-gray-200"
                     ></td>
                     <td
-                      x-text="toLocalDate(user.createdAt)"
+                      x-text="toLocalDate(admin.createdAt)"
                       class="whitespace-nowrap px-6 py-4 text-sm text-gray-800 dark:text-gray-200"
                     ></td>
                     <td
                       class="whitespace-nowrap px-6 py-4 text-center text-sm font-medium"
                     >
                       <a
-                        :href="`/accounts/users/${user.id}`"
+                        :href="`/accounts/admins/${admin.id}`"
                         type="button"
-                        target="_blank"
                         class="inline-flex items-center gap-x-2 rounded-lg border border-transparent text-sm font-semibold text-teal-600 hover:text-teal-800 disabled:pointer-events-none disabled:opacity-50 dark:text-teal-500 dark:hover:text-teal-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
                       >Details</a>
                     </td>
                   </tr>
                 </template>
 
-                <template x-if="$store.users.isEmpty()">
+                <template x-if="$store.admins.isEmpty()">
                   <tr>
                     <td
                       colspan="5"
@@ -226,12 +183,12 @@
 
           <!-- Pagination -->
           <div
-            x-show="!$store.users.isEmpty()"
+            x-show="!$store.admins.isEmpty()"
             class="grid place-items-center p-3"
           >
             <nav class="inline-flex items-center justify-center gap-3">
               <button
-                @click="$store.users.update(await $store.page.go($store.page.prev));"
+                @click="$store.admins.update(await $store.page.go($store.page.prev));"
                 :disabled="!$store.page.prev"
                 class="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
               >
@@ -257,7 +214,7 @@
               </p>
 
               <button
-                @click="$store.users.update(await $store.page.go($store.page.next));"
+                @click="$store.admins.update(await $store.page.go($store.page.next));"
                 :disabled="!$store.page.next"
                 class="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
               >
@@ -288,21 +245,21 @@
 {{#content "script"}}
   <script>
     document.addEventListener("alpine:init", () => {
-      Alpine.store("users", {
+      Alpine.store("admins", {
         init() {
           window.addEventListener("popstate", (event) => {
-            this.list = event.state.usersList;
+            this.list = event.state.adminsList;
           });
         },
 
-        list: {{{toString usersList}}},
+        list: {{{toString adminsList}}},
 
         isEmpty() {
           return this.list.length === 0;
         },
 
-        update(usersList) {
-          this.list = usersList;
+        update(adminsList) {
+          this.list = adminsList;
         }
       });
 
@@ -334,17 +291,17 @@
           const queryString = searchParams.toString();
 
           try {
-            const result = await fetch(`/api/accounts/users?${queryString}`);
+            const result = await fetch(`/api/accounts/admins?${queryString}`);
 
             if (result.ok) {
               const data = await result.json();
 
-              history.pushState(data, "", `/accounts/users?${queryString}`);
+              history.pushState(data, "", window.location.href);
 
               this.total = data.total;
               this.current = data.current;
 
-              return data.usersList;
+              return data.adminsList;
             }
           } catch (err) {
             console.log(err);

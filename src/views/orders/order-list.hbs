@@ -1,0 +1,201 @@
+<main
+  x-init="$store.sidebar.selected = 'Orders'; $store.sidebar.page='Orders';"
+  class="p-6"
+>
+  <h2 class="mb-8 p-1 text-xl font-bold text-gray-900 dark:text-white">
+    Orders list
+  </h2>
+
+  <div class="flex flex-col">
+    <div class="-m-1.5 overflow-x-auto">
+      <div class="inline-block min-w-full p-1.5 align-middle">
+        <div
+          class="divide-y divide-gray-200 rounded-lg border dark:divide-gray-700 dark:border-gray-700"
+        >
+          <!-- Search & sort -->
+          <form
+            x-data="{ order: $store.orders.order }"
+            id="search-form"
+            class="m-0 flex items-center gap-x-4 p-3"
+          >
+            <div class="relative">
+              <select
+                x-model="order"
+                name="order"
+                class="block w-full rounded-lg border-gray-200 px-3 py-2 pe-9 text-sm focus:border-teal-500 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
+              >
+                <option value="asc">Creation time (asc)</option>
+                <option value="desc">Creation time (desc)</option>
+              </select>
+            </div>
+
+            <button
+              @click.prevent="$store.orders.sort(order)"
+              type="submit"
+              class="px-2 text-sm font-medium text-teal-600 underline-offset-2 hover:underline"
+            >
+              Apply
+            </button>
+
+          </form>
+          <!-- Search & sort -->
+
+          <!-- Table -->
+          <div class="overflow-hidden">
+            <table
+              class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+            >
+              <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  {{! <th
+                    scope="col"
+                    class="w-16 py-3 pl-6 text-center text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
+                  ></th> }}
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
+                  >Order ID</th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
+                  >Amount</th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-center text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
+                  >Status</th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-center text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
+                  >Creation time</th>
+                  <th
+                    scope="col"
+                    colspan="3"
+                    class="px-6 py-3 text-center text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
+                  >Update status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                <template x-for="order in $store.orders.data" :key="order.id">
+                  <tr>
+                    <td
+                      class="text-hover-700 whitespace-nowrap px-6 py-4 text-sm font-medium text-teal-600 dark:text-gray-200"
+                    >
+                      <a :href="`/orders/${order.id}`">
+                        <span>#</span>
+                        <span x-text="order.id"></span>
+                      </a>
+                    </td>
+                    <td
+                      x-text="currencyFormatter.format(order.total)"
+                      class="whitespace-nowrap px-6 py-4 text-sm text-gray-800 dark:text-gray-200"
+                    ></td>
+                    <td
+                      class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-800 dark:text-gray-200"
+                    >
+                      <span class="block capitalize">
+                        <span
+                          x-text="order.status"
+                          :class="{
+                          'bg-teal-50 text-teal-800 ': order.status === 'paid',
+                          'bg-yellow-50 text-yellow-600': order.status === 'pending',
+                          'bg-red-50 text-red-600': order.status === 'cancelled',
+                        }"
+                          class="inline-flex items-center gap-x-1 rounded-full px-1.5 py-1 text-xs font-medium"
+                        >
+                        </span>
+                      </span>
+                    </td>
+                    <td
+                      x-text="order.createdAt"
+                      class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-800 dark:text-gray-200"
+                    ></td>
+                    <td
+                      class="w-24 whitespace-nowrap px-6 py-4 text-center text-sm font-medium"
+                    >
+                      <button
+                        :disabled="order.status === 'paid'"
+                        @click="await $store.orders.update(order.id, 'paid');"
+                        class="inline-flex items-center gap-x-3 rounded-lg border border-transparent px-1 text-sm font-semibold text-teal-600 hover:text-teal-800 disabled:pointer-events-none disabled:opacity-50 dark:text-teal-500 dark:hover:text-teal-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+                      >Paid</button>
+                      <button
+                        :disabled="order.status === 'pending'"
+                        @click="await $store.orders.update(order.id, 'pending');"
+                        class="inline-flex items-center gap-x-3 rounded-lg border border-transparent px-1 text-sm font-semibold text-teal-600 hover:text-teal-800 disabled:pointer-events-none disabled:opacity-50 dark:text-teal-500 dark:hover:text-teal-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+                      >Pending</button>
+                      <button
+                        :disabled="order.status === 'cancelled'"
+                        @click="await $store.orders.update(order.id, 'cancelled');"
+                        class="inline-flex items-center gap-x-3 rounded-lg border border-transparent px-1 text-sm font-semibold text-teal-600 hover:text-teal-800 disabled:pointer-events-none disabled:opacity-50 dark:text-teal-500 dark:hover:text-teal-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+                      >Cancelled</button>
+                    </td>
+                  </tr>
+                </template>
+
+                <template x-if="!$store.orders.data.length">
+                  <tr>
+                    <td
+                      colspan="6"
+                      class="whitespace-nowrap px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-gray-200"
+                    >No orders found</td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          <!-- Table -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button
+    @click="window.history.back();"
+    class="mt-6 block rounded-md bg-teal-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-teal-700 dark:hover:bg-teal-500"
+  >
+    Back
+  </button>
+</main>
+
+{{! prettier-ignore }}
+{{#content "script"}}
+  <script>
+    document.addEventListener("alpine:init", () => {
+      Alpine.store("orders", {
+        data: {{{toString orders}}},
+        order: 'desc',
+
+        sort(newOrder) {
+          if (newOrder !== this.order) {
+            this.order = newOrder;
+            this.data.reverse();
+          }
+        },
+
+        async update(id, status) {
+          try {
+            const response = await fetch(`/api/orders/${id}/status`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ status }),
+            });
+
+            if (!response.ok) {
+              toast("Unable to update order status. Please try again later!", {type: "danger"});
+              return;
+            }
+
+            const o = this.data.find((order) => order.id === id);
+            o.status = status;
+            toast("Order status updated successfully!", {type: "success"});
+          } catch (err) {
+            console.log(err)
+            toast("Something went wrong", {type: "danger"});
+          }
+        }
+      });
+    });
+  </script>
+{{/content}}

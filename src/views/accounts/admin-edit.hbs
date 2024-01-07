@@ -1,0 +1,251 @@
+<main>
+  <div class="flex justify-center">
+    <div>
+      <div
+        class="grid max-w-screen-xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3"
+      >
+
+        <div id="personal-information">
+          <h2 class="text-base font-semibold leading-7 text-gray-900">
+            Personal Information
+          </h2>
+          <p class="tex-gray-700 mt-1 text-sm leading-6">
+            Update your personal information.
+          </p>
+        </div>
+        <form
+          x-data="{ loading: false }"
+          @submit.prevent="loading = true; await $store.account.updateInfo(); loading = false;"
+          class="col-span-2"
+        >
+          <div
+            class="grid grid-cols-1 gap-x-6 gap-y-6 sm:max-w-xl sm:grid-cols-6"
+          >
+            <div class="col-span-full">
+              <label
+                for="username"
+                class="block text-sm font-medium leading-6 text-gray-900"
+              >Username
+              </label>
+              <div class="mt-2">
+                <input
+                  disabled
+                  x-model="$store.account.username"
+                  id="username"
+                  type="text"
+                  autocomplete="off"
+                  class="block w-full rounded-md border-0 bg-black/5 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div class="col-span-full">
+              <label
+                for="userFullName"
+                class="block text-sm font-medium leading-6 text-gray-900"
+              >Name
+              </label>
+              <div class="mt-2">
+                <input
+                  :disabled="loading"
+                  required
+                  id="name"
+                  name="name"
+                  x-model="$store.account.name"
+                  type="text"
+                  autocomplete="off"
+                  class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div class="mt-2">
+              <button
+                type="submit"
+                class="grid h-9 w-16 place-content-center rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700 dark:hover:bg-teal-500"
+                x-html="loading ? 
+                `<div class='animate-spin h-4 w-4 border-[3px] border-current border-t-transparent text-white rounded-full dark:text-white' role='status' aria-label='loading'>
+                  <span class='sr-only'>Loading...</span>
+                </div>` : 'Save'"
+              >
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div
+        class="grid max-w-screen-xl grid-cols-1 gap-x-8 gap-y-10 border-t border-t-gray-200 px-4 py-16 sm:px-6 md:grid-cols-3"
+      >
+        <div>
+          <h2 class="text-base font-semibold leading-7 text-gray-900">
+            Change password
+          </h2>
+          <p class="tex-gray-700 mt-1 text-sm leading-6">
+            Update your password associated with your account.
+          </p>
+        </div>
+        <form
+          x-data="{ loading: false }"
+          @submit.prevent="loading = true; await $store.account.updatePassword(); loading = false;"
+          id="password-form"
+          class="col-span-2"
+        >
+          <div
+            class="grid grid-cols-1 gap-x-6 gap-y-6 sm:max-w-xl sm:grid-cols-6"
+          >
+
+            <div class="col-span-full">
+              <label
+                for="current-password"
+                class="block text-sm font-medium leading-6 text-gray-900"
+              >Current password
+              </label>
+              <div class="mt-2">
+                <input
+                  :disabled="loading"
+                  required
+                  x-model="$store.account.password.current"
+                  id="current-password"
+                  type="password"
+                  name="currentPassword"
+                  autocomplete="current-password"
+                  class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div class="col-span-full">
+              <label
+                for="new-password"
+                class="block text-sm font-medium leading-6 text-gray-900"
+              >New password
+              </label>
+              <div class="mt-2">
+                <input
+                  :disabled="loading"
+                  required
+                  x-model="$store.account.password.new"
+                  id="new-password"
+                  type="password"
+                  name="newPassword"
+                  autocomplete="new-password"
+                  class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div class="col-span-full">
+              <label
+                for="confirm-password"
+                class="block text-sm font-medium leading-6 text-gray-900"
+              >Confirm password
+              </label>
+              <div class="mt-2">
+                <input
+                  :disabled="loading"
+                  required
+                  x-model="$store.account.password.confirm"
+                  id="confirm-password"
+                  type="password"
+                  autocomplete="new-password"
+                  class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div class="mt-2">
+              <button
+                type="submit"
+                class="grid h-9 w-16 place-content-center rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700 dark:hover:bg-teal-500"
+                x-html="loading ? 
+                `<div class='animate-spin h-4 w-4 border-[3px] border-current border-t-transparent text-white rounded-full dark:text-white' role='status' aria-label='loading'>
+                  <span class='sr-only'>Loading...</span>
+                </div>` : 'Save'"
+              >
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+{{! prettier-ignore}}
+{{#content "script"}}
+<script>
+  document.addEventListener("alpine:init",  () => {
+    Alpine.store('account', {
+      id: '{{data.id}}',
+      username: '{{data.username}}',
+      name: '{{data.name}}',
+
+      password: {
+        current: '',
+        new: '',
+        confirm: '',
+      },
+
+      async updatePassword() {
+        if (this.password.new !== this.password.confirm) {
+          toast("Confirm password does not match!", {type: "warning"});
+          return;
+        }
+        if (this.password.new.length < 6) {
+          toast("Password must be at least 6 characters!", {type: "warning"});
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/accounts/admins/password`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              currentPassword: this.password.current,
+              newPassword: this.password.new,
+            }),
+          })
+
+          if (response.ok) {
+            toast("Password updated successfully!", {type: "success"});
+            this.password.current = this.password.new = this.password.confirm = '';
+          } else {
+            const responseJson = await response.json()
+            toast(responseJson.error.message, {type: responseJson.error.type});
+          }
+        } catch (err) {
+          toast("Cannot communicate with server. Please try again later!", {type: "warning"});
+        }
+      },
+
+      async updateInfo() {
+        try {
+          const response = await fetch(`/api/accounts/admins/info`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              name: this.name,
+            }),
+          });
+
+          if (!response.ok) {
+            const responseJson2 = await response.json()
+            toast(responseJson.error.message, {type: responseJson.error.type});
+            return;
+          } 
+
+          toast("Personal information updated successfully!", {type: "success"});
+        } catch (err) {
+          console.log(err)
+          toast("Cannot communicate with server. Please try again later!", {type: "warning"});
+        }
+      }
+    });
+  });
+</script>
+{{/content}}

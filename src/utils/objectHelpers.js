@@ -48,3 +48,11 @@ exports.omit = (obj, keys) =>
   Object.fromEntries(
     Object.entries(obj).filter(([key]) => !keys.includes(key)),
   );
+
+exports.groupBy = (arr, key) => {
+  return arr.reduce(function (r, a) {
+    r[a[key]] = r[a[key]] || [];
+    r[a[key]].push(a);
+    return r;
+  }, {});
+};

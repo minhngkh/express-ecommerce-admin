@@ -46,7 +46,7 @@ exports.parseJsonList = (data) => {
 };
 
 exports.toString = (obj) => {
-  return util.inspect(obj);
+  return util.inspect(obj, { depth: null });
 };
 
 exports.toStringList = (list) => {
