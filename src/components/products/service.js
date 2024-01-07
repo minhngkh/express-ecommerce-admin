@@ -8,6 +8,7 @@ const {
   or,
   sql,
   getTableColumns,
+  sum,
 } = require("drizzle-orm");
 
 const db = require("#db/client");
@@ -20,6 +21,7 @@ const {
   productCategory,
   productImage,
   productSubcategory,
+  orderItem,
 } = require("#db/schema");
 const { omit } = require("#utils/objectHelpers");
 
@@ -105,10 +107,12 @@ exports.getProducts = (query) => {
       status: product.status,
       createdAt: ProductUtcCreatedAt,
       image: productImage.source,
+      purchases: sum(orderItem.quantity).as("purchases"),
     })
     .from(product)
     .innerJoin(productCategory, eq(product.categoryId, productCategory.id))
     .innerJoin(productBrand, eq(product.brandId, productBrand.id))
+    .leftJoin(orderItem, eq(product.id, orderItem.productId))
     .leftJoin(
       productSubcategory,
       eq(product.subcategoryId, productSubcategory.id),
@@ -121,6 +125,7 @@ exports.getProducts = (query) => {
       ),
     )
     .where(and(...conditions, IsDeletedCondition))
+    .groupBy(product.id)
     .orderBy(order)
     .limit(query.limit)
     .offset((query.page - 1) * query.limit);
@@ -430,6 +435,12 @@ const processQuery = (query) => {
         break;
       case ListOrder.PriceDesc:
         result.order = desc(product.price);
+        break;
+      case ListOrder.PurchasesAsc:
+        result.order = sql`purchases ASC`;
+        break;
+      case ListOrder.PurchasesDesc:
+        result.order = sql`purchases DESC`;
         break;
       default:
         break;
