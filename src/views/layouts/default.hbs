@@ -105,6 +105,12 @@
         const date = new Date(time);
         return date.toISOString().replace("T"," ").substring(0, 19);
       }
+
+      const currencyFormatter = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      });
+
     </script>
 
     {{#block "script"}}{{/block}}

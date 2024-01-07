@@ -145,7 +145,7 @@
 
                   <th
                     scope="col"
-                    colspan="2"
+                    colspan="3"
                     class="px-6 py-3 text-center text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
                   >Action</th>
                 </tr>
@@ -223,6 +223,16 @@
                     ></td>
                     <td
                       class="w-24 whitespace-nowrap py-4 pl-6 text-center text-sm font-medium"
+                    >
+                      <a
+                        :href="`/orders/user/${user.id}`"
+                        type="button"
+                        target=""
+                        class="inline-flex items-center rounded-lg border border-transparent px-2 text-sm font-semibold text-teal-600 hover:text-teal-800 disabled:pointer-events-none disabled:opacity-50 dark:text-teal-500 dark:hover:text-teal-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+                      >Orders</a>
+                    </td>
+                    <td
+                      class="w-24 whitespace-nowrap py-4 text-center text-sm font-medium"
                     >
                       <a
                         :href="`/accounts/users/${user.id}`"

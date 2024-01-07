@@ -296,7 +296,7 @@
             if (result.ok) {
               const data = await result.json();
 
-              history.pushState(data, "", `window.location.href`);
+              history.pushState(data, "", window.location.href);
 
               this.total = data.total;
               this.current = data.current;

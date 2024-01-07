@@ -11,13 +11,16 @@ const session = require("#middlewares/session");
 const hbsHelpers = require("#utils/hbsHelpers");
 
 const accountsApiRouter = require("#components/accounts/api/router");
+const ordersApiRouter = require("#components/orders/api/router");
 const productsApiRouter = require("#components/products/api/router");
 
 const accountsRouter = require("#components/accounts/router");
 const authRouter = require("#components/auth/router");
 const homeRouter = require("#components/home/router");
+const ordersRouter = require("#components/orders/router");
 const productsRouter = require("#components/products/router");
 const testRouter = require("#components/test/router");
+const reportsRouter = require("#components/reports/router");
 
 // Init Express app
 const app = express();
@@ -57,11 +60,14 @@ app.use("/auth", authRouter);
 app.use(authenticated.require);
 
 app.use("/api/accounts", accountsApiRouter);
+app.use("/api/orders", ordersApiRouter);
 app.use("/api/products", productsApiRouter);
 
 app.use("/", homeRouter);
 app.use("/accounts", accountsRouter);
+app.use("/orders", ordersRouter);
 app.use("/products", productsRouter);
+app.use("/reports", reportsRouter);
 
 app.use("/test", testRouter);
 
