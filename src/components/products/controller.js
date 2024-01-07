@@ -1,8 +1,9 @@
 const { currencyFormatter } = require("#utils/formatter");
+const { groupBy } = require("#utils/objectHelpers");
 const { processSearchQuery } = require("./helpers");
 const productsService = require("./service");
 
-const CategoryFmtName = {
+const CategoryPath = {
   Laptops: "laptops",
   Phones: "phones",
 };
@@ -41,7 +42,34 @@ exports.renderProductList = async (req, res, next) => {
         total: totalPages,
         current: query.page,
       },
-      categoryPath: CategoryFmtName,
+      categoryPath: CategoryPath,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+exports.renderProductCreatePage = async (req, res, next) => {
+  const statuses = Object.values(productsService.ProductStatus);
+  try {
+    const [categories, _subcategories, _brands] = await Promise.all([
+      productsService.getCategories(),
+      productsService.getSubcategories(),
+      productsService.getBrandsCategoryInfo(),
+    ]);
+
+    const subcategories = groupBy(_subcategories, "categoryId");
+    const brands = groupBy(_brands, "categoryId");
+
+    res.render(`products/product-create`, {
+      title: `Products | Create`,
+
+      options: {
+        categories: categories,
+        subcategories: subcategories,
+        brands: brands,
+        statuses: statuses,
+      },
     });
   } catch (err) {
     return next(err);

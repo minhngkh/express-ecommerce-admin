@@ -2,6 +2,7 @@ const { asc, and, count, desc, eq, like, or, sql } = require("drizzle-orm");
 
 const db = require("#db/client");
 const {
+  brandInCategory,
   laptopProduct,
   phoneProduct,
   product,
@@ -24,15 +25,20 @@ const ListOrder = {
   PurchasesDesc: "purchases-desc",
 };
 
-const ProductStatus = {
-  OnStock: "On stock",
-  OutOfStock: "Out of stock",
-  Suspend: "Suspend",
+exports.ProductStatus = {
+  OnStock: "on stock",
+  OutOfStock: "out of stock",
+  Suspend: "suspend",
 };
 
 const ProductExtendedTable = {
   laptops: laptopProduct,
   phones: phoneProduct,
+};
+
+const CategoryAlias = {
+  0: "laptops",
+  1: "phones",
 };
 
 /**
@@ -91,7 +97,7 @@ exports.getProducts = (query) => {
     .from(product)
     .innerJoin(productCategory, eq(product.categoryId, productCategory.id))
     .innerJoin(productBrand, eq(product.brandId, productBrand.id))
-    .innerJoin(
+    .leftJoin(
       productSubcategory,
       eq(product.subcategoryId, productSubcategory.id),
     )
@@ -513,4 +519,58 @@ exports.getOrders = (userId) => {
  */
 exports.getOrder = (orderId) => {
   return db.select().from(order).where(eq(order.id, orderId));
+};
+
+exports.getBrandsCategoryInfo = () => {
+  return db
+    .select({
+      id: productBrand.id,
+      name: productBrand.name,
+      categoryId: brandInCategory.categoryId,
+    })
+    .from(productBrand)
+    .innerJoin(brandInCategory, eq(productBrand.id, brandInCategory.brandId));
+};
+
+/**
+ *
+ * @param {object} productData
+ * @returns
+ */
+exports.createProduct = (productData) => {
+  const extTable = ProductExtendedTable[CategoryAlias[productData.categoryId]];
+  if (!extTable) return null;
+
+  const { specs, ...info } = productData;
+
+  const transaction = db.transaction(async (tx) => {
+    const [{ id }] = await tx.insert(product).values(info).returning({
+      id: product.id,
+    });
+
+    await tx.insert(extTable).values({
+      ...specs,
+      productId: id,
+      categoryId: productData.categoryId,
+    });
+
+    return id;
+  });
+
+  return transaction;
+};
+
+exports.setProductImages = (id, primary, extras) => {
+  return db.insert(productImage).values([
+    {
+      productId: id,
+      source: primary,
+      isPrimary: true,
+    },
+    ...extras.map((e) => ({
+      productId: id,
+      source: e,
+      isPrimary: false,
+    })),
+  ]);
 };

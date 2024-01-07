@@ -1,3 +1,4 @@
+const CreateError = require("http-errors");
 const adminsService = require("./service");
 
 exports.renderAdminsList = async (req, res, next) => {
@@ -26,7 +27,7 @@ exports.renderAdminsList = async (req, res, next) => {
 };
 
 exports.renderAminDetails = async (req, res, next) => {
-  const adminDetails = await adminsService.getAdminDetails(req.params.username);
+  const adminDetails = await adminsService.getAdminDetails(req.params.id);
 
   if (!adminDetails) {
     return next();
@@ -35,5 +36,20 @@ exports.renderAminDetails = async (req, res, next) => {
   res.render("accounts/admin-details", {
     title: "Accounts | Admin details",
     admin: adminDetails,
+  });
+};
+
+exports.renderEditPage = async (req, res, next) => {
+  const data = await adminsService.getAdminDetails(req.params.id);
+  if (!data) {
+    return next();
+  }
+  if (data.username !== req.user.username) {
+    return next(CreateError(403));
+  }
+
+  res.render("accounts/admin-edit", {
+    title: "Accounts | Admin edit",
+    data: data,
   });
 };

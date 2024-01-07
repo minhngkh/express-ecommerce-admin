@@ -11,6 +11,7 @@ const session = require("#middlewares/session");
 const hbsHelpers = require("#utils/hbsHelpers");
 
 const accountsApiRouter = require("#components/accounts/api/router");
+const productsApiRouter = require("#components/products/api/router");
 
 const accountsRouter = require("#components/accounts/router");
 const authRouter = require("#components/auth/router");
@@ -46,6 +47,7 @@ app.use(passport.authenticate("session"));
 // Add user authentication status to locals
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.isAuthenticated();
+  res.locals.account = req.user;
   next();
 });
 
@@ -55,6 +57,7 @@ app.use("/auth", authRouter);
 app.use(authenticated.require);
 
 app.use("/api/accounts", accountsApiRouter);
+app.use("/api/products", productsApiRouter);
 
 app.use("/", homeRouter);
 app.use("/accounts", accountsRouter);

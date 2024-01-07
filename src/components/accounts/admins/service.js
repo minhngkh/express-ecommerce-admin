@@ -71,7 +71,7 @@ exports.existsAdmin = (username) => {
   });
 };
 
-exports.getAdminDetails = (username) => {
+exports.getAdminDetails = (id) => {
   const query = db
     .select({
       id: admin.id,
@@ -80,7 +80,7 @@ exports.getAdminDetails = (username) => {
       createdAt: UtcTimeField,
     })
     .from(admin)
-    .where(eq(admin.username, username))
+    .where(eq(admin.id, id))
     .limit(1);
 
   return query.then((val) => {
@@ -223,23 +223,8 @@ const createConditionsList = (query) => {
  * @param {Number} id
  * @param {Object} adminData
  * @param {string} adminData.name
- * @param {string} adminData.username
- * @param {string} adminData.password
  * @returns
  */
 exports.updateAdmin = async (id, adminData) => {
-  return bcrypt.hash(adminData.password, SALT_ROUNDS).then((hash) => {
-    const query = db
-      .update(admin)
-      .set({
-        name: adminData.name,
-        username: adminData.username,
-        password: hash,
-      })
-      .where(eq(admin.id, id));
-
-    return query.then((val) => {
-      return val;
-    });
-  });
+  return db.update(admin).set(adminData).where(eq(admin.id, id));
 };

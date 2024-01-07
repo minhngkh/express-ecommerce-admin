@@ -1,4 +1,4 @@
-const DefaultListLimit = 12;
+const DefaultListLimit = 6;
 
 /**
  *

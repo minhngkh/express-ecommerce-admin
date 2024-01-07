@@ -3,7 +3,7 @@ const { asc, and, count, desc, eq, like, sql } = require("drizzle-orm");
 const db = require("#db/client");
 const { user } = require("#db/schema");
 
-const DEFAULT_LIST_LIMIT = 12;
+const DEFAULT_LIST_LIMIT = 6;
 
 const UtcTimeField = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${user.createdAt})`;
 
@@ -94,6 +94,7 @@ exports.getUserList = (query) => {
       avatar: user.avatar,
       createdAt: UtcTimeField,
       isBanned: user.isBanned,
+      isVerified: user.isVerified,
     })
     .from(user)
     .where(and(...conditions))
