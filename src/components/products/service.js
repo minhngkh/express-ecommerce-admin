@@ -1,4 +1,14 @@
-const { asc, and, count, desc, eq, like, or, sql } = require("drizzle-orm");
+const {
+  asc,
+  and,
+  count,
+  desc,
+  eq,
+  like,
+  or,
+  sql,
+  getTableColumns,
+} = require("drizzle-orm");
 
 const db = require("#db/client");
 const {
@@ -55,6 +65,8 @@ const CategoryAlias = {
 
 const ProductUtcCreatedAt = sql`strftime('%Y-%m-%dT%H:%M:%fZ', ${product.createdAt})`;
 
+const IsDeletedCondition = eq(product.isDeleted, false);
+
 exports.getTotalProducts = (query) => {
   const conditions = createConditionsList(query);
 
@@ -63,7 +75,7 @@ exports.getTotalProducts = (query) => {
       count: count(),
     })
     .from(product)
-    .where(and(...conditions));
+    .where(and(...conditions, eq(product.isDeleted, false)));
 
   return dbQuery.then((val) => {
     return val[0].count;
@@ -108,7 +120,7 @@ exports.getProducts = (query) => {
         eq(productImage.isPrimary, true),
       ),
     )
-    .where(and(...conditions))
+    .where(and(...conditions, IsDeletedCondition))
     .orderBy(order)
     .limit(query.limit)
     .offset((query.page - 1) * query.limit);
@@ -121,9 +133,17 @@ exports.getProducts = (query) => {
  * @returns
  */
 exports.getProductDetails = (category, id) => {
-  console.log(laptopProduct.$inferSelect());
   const query = db
-    .select()
+    .select({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      brandId: product.brandId,
+      categoryId: product.categoryId,
+      subcategoryId: product.subcategoryId,
+      status: product.status,
+      specs: getTableColumns(ProductExtendedTable[category]),
+    })
     .from(product)
     .innerJoin(
       ProductExtendedTable[category],
@@ -134,17 +154,7 @@ exports.getProductDetails = (category, id) => {
     .limit(1);
 
   return query.then((val) => {
-    if (!val.length) return null;
-
-    return {
-      id: val[0].product.id,
-      name: val[0].product.name,
-      price: val[0].product.price,
-      brand: val[0].product_brand.name,
-      status: val[0].product.status,
-      category: category,
-      details: Object.values(omit(val[0], ["product", "product_brand"]))[0],
-    };
+    return val.length ? val[0] : null;
   });
 };
 
@@ -573,4 +583,35 @@ exports.setProductImages = (id, primary, extras) => {
       isPrimary: false,
     })),
   ]);
+};
+
+/**
+ *
+ * @param {number} id
+ * @param {object} productData
+ */
+exports.updateProduct = (productId, productData) => {
+  const extTable = ProductExtendedTable[CategoryAlias[productData.categoryId]];
+  if (!extTable) return null;
+
+  const { specs, ...info } = productData;
+
+  const batch = db.batch([
+    db.update(product).set(info).where(eq(product.id, productId)),
+    db.update(extTable).set(specs).where(eq(extTable.productId, productId)),
+  ]);
+
+  return batch;
+};
+
+/**
+ *
+ * @param {number} productId
+ * @returns
+ */
+exports.softDeleteProduct = (productId) => {
+  return db
+    .update(product)
+    .set({ isDeleted: true })
+    .where(eq(product.id, productId));
 };

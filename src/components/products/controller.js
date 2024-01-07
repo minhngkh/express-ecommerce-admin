@@ -1,3 +1,5 @@
+const { param, validationResult } = require("express-validator");
+
 const { currencyFormatter } = require("#utils/formatter");
 const { groupBy } = require("#utils/objectHelpers");
 const { processSearchQuery } = require("./helpers");
@@ -75,3 +77,55 @@ exports.renderProductCreatePage = async (req, res, next) => {
     return next(err);
   }
 };
+
+exports.renderProductDetails = [
+  [
+    param("category").isIn(Object.values(CategoryPath)),
+    param("productId").isInt({ min: 0 }),
+  ],
+
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next();
+    }
+
+    const { category, productId } = req.params;
+
+    const statuses = Object.values(productsService.ProductStatus);
+    try {
+      const [product, categories, _subcategories, _brands] = await Promise.all([
+        productsService.getProductDetails(category, productId),
+        productsService.getCategories(),
+        productsService.getSubcategories(),
+        productsService.getBrandsCategoryInfo(),
+      ]);
+
+      const subcategories = _subcategories.filter(
+        (val) => val.categoryId === product.categoryId,
+      );
+      const brands = _brands.filter(
+        (val) => val.categoryId === product.categoryId,
+      );
+
+      if (!product) {
+        return next();
+      }
+
+      res.render(`products/product-details`, {
+        title: `Products | ${product.name}`,
+
+        category: category,
+        product: product,
+        options: {
+          categories: categories,
+          subcategories: subcategories,
+          brands: brands,
+          statuses: statuses,
+        },
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+];

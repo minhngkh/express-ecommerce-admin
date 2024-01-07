@@ -10,7 +10,7 @@ const { currencyFormatter } = require("#utils/formatter");
 const productsService = require("../service");
 const { processSearchQuery } = require("../helpers");
 
-const MAX_PRODUCT_EXTRA_IMG = 4;
+// const MAX_PRODUCT_EXTRA_IMG = 4;
 
 exports.getProductList = async (req, res, _) => {
   const query = processSearchQuery(req.query);
@@ -44,7 +44,7 @@ exports.getImgUploadSignature = [
   (req, res, _) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ message: "Invalid product id" });
+      return res.status(400).end();
     }
 
     const { productId } = req.params;
@@ -101,7 +101,7 @@ exports.setProductImages = [
   async (req, res, _) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ message: "Invalid product id" });
+      return res.status(400).end();
     }
 
     const { productId } = req.params;
@@ -115,6 +115,69 @@ exports.setProductImages = [
       return res.status(403).json({
         error: {
           message: "Unable to set product images",
+          type: "danger",
+        },
+      });
+    }
+  },
+];
+
+exports.updateProduct = [
+  [
+    param("productId").isInt({ min: 0 }),
+    body("name").notEmpty(),
+    body("categoryId").isInt({ min: 0 }).toInt(),
+    body("subcategoryId").isInt({ min: 0 }).toInt(),
+    body("brandId").isInt({ min: 0 }).toInt(),
+    body("price").isInt({ min: 0 }).toInt(),
+    body("status").custom((val) => {
+      return Object.values(productsService.ProductStatus).includes(val);
+    }),
+    body("specs").isObject(),
+  ],
+
+  async (req, res, _) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).end();
+    }
+
+    const { productId, ...data } = matchedData(req);
+
+    try {
+      await productsService.updateProduct(productId, data);
+      return res.status(200).end();
+    } catch (err) {
+      console.log(err);
+      return res.status(403).json({
+        error: {
+          message: "Unable to update product",
+          type: "danger",
+        },
+      });
+    }
+  },
+];
+
+exports.deleteProduct = [
+  param("productId").isInt({ min: 0 }),
+
+  async (req, res, _) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).end();
+    }
+
+    const { productId } = req.params;
+
+    try {
+      await productsService.softDeleteProduct(productId);
+      return res.status(200).end();
+    } catch (err) {
+      console.log(err);
+      return res.status(403).json({
+        error: {
+          message: "Unable to delete product",
           type: "danger",
         },
       });

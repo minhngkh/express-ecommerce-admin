@@ -8,6 +8,10 @@ router.get("/", apiProductsController.getProductList);
 
 router.post("/", apiProductsController.createProduct);
 
+router.put("/:productId", apiProductsController.updateProduct);
+
+router.delete("/:productId", apiProductsController.deleteProduct);
+
 router.get(
   "/:productId/images/upload_signature",
   apiProductsController.getImgUploadSignature,

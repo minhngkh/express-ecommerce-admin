@@ -28,236 +28,244 @@
             }"
             action="/products/"
             method="get"
-            class="m-0 flex items-center gap-x-4 p-3"
+            class="m-0 flex items-center justify-between gap-x-4 p-3"
           >
-            <!-- Select: sort -->
-            <div class="relative">
-              <select
-                x-model="sort"
-                name="sort"
-                class="block w-full rounded-lg border-gray-200 px-3 py-2 pe-9 text-sm focus:border-teal-500 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
-              >
-                <option value="creation-asc">Creation time (asc)</option>
-                <option value="creation-desc">Creation time (desc)</option>
-                <option value="price-asc">Price (asc)</option>
-                <option value="price-desc">Price (desc)</option>
-                <option value="purchases-asc">Total purchases (asc)</option>
-                <option value="purchases-desc">Total purchases (desc)</option>
-              </select>
-            </div>
-            <!-- Select: sort -->
-
-            <!-- Select: category -->
-            <div class="relative">
-              <select
-                @change="subcategoryIds = []"
-                x-model="categoryId"
-                :name="categoryId ? 'category' : ''"
-                class="block w-full rounded-lg border-gray-200 px-3 py-2 pe-9 text-sm focus:border-teal-500 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
-              >
-                <option value="">All</option>
-                {{#each filter.categories}}
-                  <option value="{{id}}">{{name}}</option>
-                {{/each}}
-              </select>
-            </div>
-            <!-- Select: category -->
-
-            <!-- Checkboxes: subcategory -->
-            <div x-data="{ isOpen: false }" class="relative overflow-visible">
-              <button
-                :disabled="!categoryId"
-                @click="isOpen = !isOpen"
-                type="button"
-                class="flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 transition focus:border-teal-500 focus:ring-1 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50"
-              >
-                <span class="text-sm"> Subcategory </span>
-
-                <span class="relative w-6">
-                  <p
-                    :class="subcategoryIds.length ? '' : 'hidden'"
-                    class="absolute top-1/2 inline-block h-6 w-6 -translate-x-1/2 -translate-y-1/2 whitespace-pre rounded-full bg-teal-600 py-1 text-center text-xs text-white"
-                    x-text="`${subcategoryIds.length}`"
-                  ></p>
-                </span>
-
-                <span class="transition" :class="{ '-rotate-180': isOpen }">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="h-4 w-4"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                    />
-                  </svg>
-                </span>
-              </button>
-
-              <div
-                x-cloak
-                x-show="isOpen && categoryId"
-                x-on:keydown.escape.window="isOpen = false"
-                class="absolute mt-3 min-w-full border-gray-200 dark:border-gray-700 dark:bg-gray-900"
-              >
-                <ul
-                  class="top-full z-10 space-y-1 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700"
+            <div class="m-0 flex items-center gap-x-4">
+              <!-- Select: sort -->
+              <div class="relative">
+                <select
+                  x-model="sort"
+                  name="sort"
+                  class="block w-full rounded-lg border-gray-200 px-3 py-2 pe-9 text-sm focus:border-teal-500 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
                 >
-                  {{#each filter.subcategories}}
-                    <li x-show="categoryId === '{{categoryId}}'">
-                      <label
-                        for="{{id}}"
-                        class="inline-flex items-center gap-2"
-                      >
-                        <input
-                          x-model="subcategoryIds"
-                          type="checkbox"
-                          id="{{id}}"
-                          value="{{id}}"
-                          class="h-5 w-5 rounded border-gray-300 text-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-900 dark:focus:ring-offset-gray-900"
-                        />
-
-                        <span
-                          class="text-sm font-medium text-gray-700 dark:text-gray-200"
-                        >
-                          {{name}}
-                        </span>
-                      </label>
-                    </li>
-                  {{/each}}
-                </ul>
+                  <option value="creation-asc">Creation time (asc)</option>
+                  <option value="creation-desc">Creation time (desc)</option>
+                  <option value="price-asc">Price (asc)</option>
+                  <option value="price-desc">Price (desc)</option>
+                  <option value="purchases-asc">Total purchases (asc)</option>
+                  <option value="purchases-desc">Total purchases (desc)</option>
+                </select>
               </div>
-
-              <input
-                class="hidden"
-                name="subcategory"
-                :value="subcategoryIds"
-                :disabled="!subcategoryIds.length"
-              />
-            </div>
-            <!-- Checkboxes: subcategory -->
-
-            <!-- Checkboxes: brand -->
-            <div x-data="{ isOpen: false }" class="relative overflow-visible">
-              <button
-                @click="isOpen = !isOpen"
-                type="button"
-                class="flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 transition focus:border-teal-500 focus:ring-1 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50"
-              >
-                <span class="text-sm"> Brand </span>
-
-                <span class="relative w-6">
-                  <p
-                    :class="brandIds.length ? '' : 'hidden'"
-                    class="absolute top-1/2 inline-block h-6 w-6 -translate-x-1/2 -translate-y-1/2 whitespace-pre rounded-full bg-teal-600 py-1 text-center text-xs text-white"
-                    x-text="`${brandIds.length}`"
-                  ></p>
-                </span>
-
-                <span class="transition" :class="{ '-rotate-180': isOpen }">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="h-4 w-4"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                    />
-                  </svg>
-                </span>
-              </button>
-
-              <div
-                x-cloak
-                x-show="isOpen"
-                x-on:keydown.escape.window="isOpen = false"
-                class="absolute mt-3 min-w-full border-gray-200 dark:border-gray-700 dark:bg-gray-900"
-              >
-                <ul
-                  class="top-full z-10 space-y-1 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700"
+              <!-- Select: sort -->
+              <!-- Select: category -->
+              <div class="relative">
+                <select
+                  @change="subcategoryIds = []"
+                  x-model="categoryId"
+                  :name="categoryId ? 'category' : ''"
+                  class="block w-full rounded-lg border-gray-200 px-3 py-2 pe-9 text-sm focus:border-teal-500 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
                 >
-                  {{#each filter.brands}}
-                    <li>
-                      <label
-                        for="{{name}}"
-                        class="inline-flex items-center gap-2"
-                      >
-                        <input
-                          x-model="brandIds"
-                          type="checkbox"
-                          id="{{name}}"
-                          value="{{id}}"
-                          class="h-5 w-5 rounded border-gray-300 text-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-900 dark:focus:ring-offset-gray-900"
-                        />
-
-                        <span
-                          class="text-sm font-medium text-gray-700 dark:text-gray-200"
-                        >
-                          {{name}}
-                        </span>
-                      </label>
-                    </li>
+                  <option value="">All</option>
+                  {{#each filter.categories}}
+                    <option value="{{id}}">{{name}}</option>
                   {{/each}}
-                </ul>
+                </select>
               </div>
-
-              <input
-                class="hidden"
-                name="brand"
-                :value="brandIds"
-                :disabled="!brandIds.length"
-              />
-            </div>
-            <!-- Checkboxes: brand -->
-
-            <!-- Search: name -->
-            <div>
-              <div class="relative max-w-xs">
-                <label class="sr-only">Search</label>
-                <input
-                  x-model="name"
-                  :name="name ? 'name' : ''"
-                  type="search"
-                  class="block w-full rounded-lg border-gray-200 px-3 py-2 ps-9 text-sm shadow-sm focus:z-10 focus:border-teal-500 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
-                  placeholder="Name"
-                />
+              <!-- Select: category -->
+              <!-- Checkboxes: subcategory -->
+              <div x-data="{ isOpen: false }" class="relative overflow-visible">
+                <button
+                  :disabled="!categoryId"
+                  @click="isOpen = !isOpen"
+                  type="button"
+                  class="flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 transition focus:border-teal-500 focus:ring-1 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50"
+                >
+                  <span class="text-sm"> Subcategory </span>
+                  <span class="relative w-6">
+                    <p
+                      :class="subcategoryIds.length ? '' : 'hidden'"
+                      class="absolute top-1/2 inline-block h-6 w-6 -translate-x-1/2 -translate-y-1/2 whitespace-pre rounded-full bg-teal-600 py-1 text-center text-xs text-white"
+                      x-text="`${subcategoryIds.length}`"
+                    ></p>
+                  </span>
+                  <span class="transition" :class="{ '-rotate-180': isOpen }">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="h-4 w-4"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                      />
+                    </svg>
+                  </span>
+                </button>
                 <div
-                  class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3"
+                  x-cloak
+                  x-show="isOpen && categoryId"
+                  x-on:keydown.escape.window="isOpen = false"
+                  class="absolute mt-3 min-w-full border-gray-200 dark:border-gray-700 dark:bg-gray-900"
                 >
-                  <svg
-                    class="h-4 w-4 text-gray-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  ><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
-                  </svg>
+                  <ul
+                    class="top-full z-10 space-y-1 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700"
+                  >
+                    {{#each filter.subcategories}}
+                      <li x-show="categoryId === '{{categoryId}}'">
+                        <label
+                          for="{{id}}"
+                          class="inline-flex items-center gap-2"
+                        >
+                          <input
+                            x-model="subcategoryIds"
+                            type="checkbox"
+                            id="{{id}}"
+                            value="{{id}}"
+                            class="h-5 w-5 rounded border-gray-300 text-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-900 dark:focus:ring-offset-gray-900"
+                          />
+                          <span
+                            class="text-sm font-medium text-gray-700 dark:text-gray-200"
+                          >
+                            {{name}}
+                          </span>
+                        </label>
+                      </li>
+                    {{/each}}
+                  </ul>
+                </div>
+                <input
+                  class="hidden"
+                  name="subcategory"
+                  :value="subcategoryIds"
+                  :disabled="!subcategoryIds.length"
+                />
+              </div>
+              <!-- Checkboxes: subcategory -->
+              <!-- Checkboxes: brand -->
+              <div x-data="{ isOpen: false }" class="relative overflow-visible">
+                <button
+                  @click="isOpen = !isOpen"
+                  type="button"
+                  class="flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 transition focus:border-teal-500 focus:ring-1 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50"
+                >
+                  <span class="text-sm"> Brand </span>
+                  <span class="relative w-6">
+                    <p
+                      :class="brandIds.length ? '' : 'hidden'"
+                      class="absolute top-1/2 inline-block h-6 w-6 -translate-x-1/2 -translate-y-1/2 whitespace-pre rounded-full bg-teal-600 py-1 text-center text-xs text-white"
+                      x-text="`${brandIds.length}`"
+                    ></p>
+                  </span>
+                  <span class="transition" :class="{ '-rotate-180': isOpen }">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="h-4 w-4"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                      />
+                    </svg>
+                  </span>
+                </button>
+                <div
+                  x-cloak
+                  x-show="isOpen"
+                  x-on:keydown.escape.window="isOpen = false"
+                  class="absolute mt-3 min-w-full border-gray-200 dark:border-gray-700 dark:bg-gray-900"
+                >
+                  <ul
+                    class="top-full z-10 space-y-1 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700"
+                  >
+                    {{#each filter.brands}}
+                      <li>
+                        <label
+                          for="{{name}}"
+                          class="inline-flex items-center gap-2"
+                        >
+                          <input
+                            x-model="brandIds"
+                            type="checkbox"
+                            id="{{name}}"
+                            value="{{id}}"
+                            class="h-5 w-5 rounded border-gray-300 text-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-900 dark:focus:ring-offset-gray-900"
+                          />
+                          <span
+                            class="text-sm font-medium text-gray-700 dark:text-gray-200"
+                          >
+                            {{name}}
+                          </span>
+                        </label>
+                      </li>
+                    {{/each}}
+                  </ul>
+                </div>
+                <input
+                  class="hidden"
+                  name="brand"
+                  :value="brandIds"
+                  :disabled="!brandIds.length"
+                />
+              </div>
+              <!-- Checkboxes: brand -->
+              <!-- Search: name -->
+              <div>
+                <div class="relative max-w-xs">
+                  <label class="sr-only">Search</label>
+                  <input
+                    x-model="name"
+                    :name="name ? 'name' : ''"
+                    type="search"
+                    class="block w-full rounded-lg border-gray-200 px-3 py-2 ps-9 text-sm shadow-sm focus:z-10 focus:border-teal-500 focus:ring-teal-500 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 dark:focus:ring-gray-600"
+                    placeholder="Name"
+                  />
+                  <div
+                    class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3"
+                  >
+                    <svg
+                      class="h-4 w-4 text-gray-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+                    </svg>
+                  </div>
                 </div>
               </div>
+              <!-- Search: name -->
+              <button
+                type="submit"
+                class="px-2 text-sm font-medium text-teal-600 underline-offset-2 hover:underline"
+              >
+                Apply
+              </button>
             </div>
-            <!-- Search: name -->
 
-            <button
-              type="submit"
-              class="px-2 text-sm font-medium text-teal-600 underline-offset-2 hover:underline"
-            >
-              Apply
-            </button>
+            <div>
+              <a
+                class="inline-flex items-center gap-x-2 rounded-lg border border-transparent bg-teal-600 px-3 py-2 text-sm font-semibold text-white hover:bg-teal-700 disabled:pointer-events-none disabled:opacity-50 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+                href="/products/create"
+              >
+                <svg
+                  class="h-4 w-4 flex-shrink-0"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+                Create
+              </a>
+            </div>
 
           </form>
           <!-- Search & sort -->
@@ -311,6 +319,7 @@
 
                   <th
                     scope="col"
+                    colspan="2"
                     class="px-6 py-3 text-center text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
                   >Action</th>
                 </tr>
@@ -372,13 +381,29 @@
                     ></td>
 
                     <td
-                      class="w-24 whitespace-nowrap px-6 py-4 text-center text-sm font-medium"
+                      class="w-24 whitespace-nowrap py-4 pl-6 text-center text-sm font-medium"
                     >
                       <a
                         :href="`/products/${categoryPath[product.category]}/${product.id}`"
                         type="button"
                         class="inline-flex items-center rounded-lg border border-transparent px-2 text-sm font-semibold text-teal-600 hover:text-teal-800 disabled:pointer-events-none disabled:opacity-50 dark:text-teal-500 dark:hover:text-teal-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
-                      >Details</a>
+                      >Update</a>
+                    </td>
+                    <td
+                      class="w-24 whitespace-nowrap py-4 pr-6 text-center text-sm text-gray-800 dark:text-gray-200"
+                    >
+                      <div
+                        x-data="{
+                          modalTitle: 'Delete product',
+                          modalContent: 'Are you sure you want to delete this product?',
+                          buttonText: 'Delete',
+                          async confirmAction() { 
+                            await $store.products.delete(product.id);
+                          },
+                        }"
+                      >
+                        {{#extend "confirmation_modal"}}{{/extend}}
+                      </div>
                     </td>
                   </tr>
                 </template>
@@ -482,6 +507,25 @@
         update(products) {
           this.list = products;
         },
+
+        async delete(id) {
+          try {
+            const response = await fetch(`/api/products/${id}`, {
+              method: "DELETE",
+            });
+
+            if (!response.ok) {
+              toast("Unable to delete product", { type: "danger" });
+              return;
+            }
+
+            toast("Product deleted", { type: "success" });
+            this.update(await Alpine.store('page').go());
+          } catch (err) {
+            toast("Something went wrong", { type: "danger" });
+            console.log(err);
+          }
+        }
       });
 
       Alpine.store("page", {
@@ -506,7 +550,7 @@
           return this.current < this.total ? this.current + 1 : null;
         },
 
-        async go(page) {
+        async go(page=this.current) {
           const searchParams = new URL(document.location).searchParams;
           searchParams.set("page", page);
           const queryString = searchParams.toString();
